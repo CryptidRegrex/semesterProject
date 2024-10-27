@@ -66,3 +66,13 @@ As an **admin**, I want to **disable users** so that **they cannot use their acc
 
 **Mis User Stories**
 
+**Story 1**
+
+As a **bad actor**, I want to **brute force accounts** so that **I can access a user's information**
+
+**Acceptance Criteria**
+1. Limit the number of times a user can attempt to login an lock that user out for a period of time
+
+**Story 2**
+
+As a **bad actor**, I want to
