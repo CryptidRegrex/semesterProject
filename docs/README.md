@@ -70,9 +70,29 @@ As an **admin**, I want to **disable users** so that **they cannot use their acc
 
 As a **bad actor**, I want to **brute force accounts** so that **I can access a user's information**
 
+**Notes**
+https://attack.mitre.org/techniques/T1110/
+
 **Acceptance Criteria**
 1. Limit the number of times a user can attempt to login an lock that user out for a period of time
+2. Set the password creation of users to user NIST acceptable password critieria
 
 **Story 2**
 
-As a **bad actor**, I want to
+As a **bad actor**, I want to **inject malicious software into my service** so that I can **execute malicious code**
+
+**Notes**
+https://attack.mitre.org/techniques/T1659/
+
+**Acceptance Criteria**
+1. Validate the image uploaded is of certain file types.
+
+**Story 3**
+
+As a **bad actor**, I want to **sniff password data in between the user and service** so that I can **access a user's account**
+
+**Notes**
+https://attack.mitre.org/techniques/T1557/
+
+**Acceptance Criteria**
+1. Enable HTTPS on django
