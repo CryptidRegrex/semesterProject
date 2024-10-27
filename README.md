@@ -5,6 +5,8 @@ This project looks to do a few different things.
 3. Update your character's stats and other information
 4. Delete characters
 5. Additionally you can view an image of your character stored with the data
+6. Register a user
+7. A user can login to create chracters
 
 #Installation
 
