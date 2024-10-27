@@ -28,3 +28,41 @@ As a **user**, I want to **reset my password** so that I can **set a new passwor
 **Acceptance Criteria**
 1. User can reset password based on the user having an existing account
 
+**Story 5**
+
+As a **user**, I want to **delete my chracter** so that I can **remove it from the list of my characters**
+
+**Acceptance Criteria**
+1. Allow the user to delete a character 
+
+
+**Story 6**
+
+As a **user**, I want to **update one of my character's stats** so that I can **keep my character up-to-date**
+
+**Acceptance Criteria**
+1. Allow a user to select and update a character's stats
+
+**Story 7**
+
+As a **user**, I want to **add a picture of my character** so that I can **store my character's look**
+
+
+**Story 8**
+
+As a **admin**, I want to **moderate user images** so that I can **delete images from the database**
+
+**Acceptance Criteria**
+1. Allow a admin/superuser to delete user photos from the site
+
+**Story 9**
+
+
+As an **admin**, I want to **disable users** so that **they cannot use their accounts**
+
+**Acceptance Criteria**
+1. Give admin/superuser acess to disabling user accounts
+
+
+**Mis User Stories**
+
