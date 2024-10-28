@@ -64,6 +64,28 @@ As an **admin**, I want to **disable users** so that **they cannot use their acc
 1. Give admin/superuser acess to disabling user accounts
 
 
+**Story 10**
+
+As a **DM**, I want to **Create a campaign** players can join **so that I can have all plyer information to view**
+
+**Acceptance Criteria**
+1. Create a campaign
+2. Relate characters to campaign objects
+3. Give access to Owner of campaign to player's character
+
+
+**Story 11**
+
+
+As a **DM**, I want to **Relate a Character to a Campaign** so that **I can update a player's character info**
+
+**Acceptance Criteria**
+1. Allow owner of campaign to update character's info. 
+
+
+
+
+
 **Mis User Stories**
 
 **Story 1**
