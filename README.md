@@ -7,13 +7,23 @@ This project looks to do a few different things.
 5. Additionally you can view an image of your character stored with the data
 6. Register a user
 7. A user can login to create chracters
+8. A user can create a campaign, relate characters to campaign, and edit stats of a character in a related campaign
 
 #Installation
-
+#First create the docker container
+docker build -t CharacterCreation .
+#Run the process
+docker run CharacterCreation
+#makemigration to postgres
+docker-compose run web python manage.py makemigrations
+#migrate the database
+docker-compose run web python manage.py migrate
+#compose and build the container again
+docker-compose up --build
 
 
 #Getting Started
-
+docker-compose up
 
 
 #License
