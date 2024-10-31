@@ -63,12 +63,12 @@ class Character(models.Model):
     
     #Essentially, like in D&D take the score -10 and get the bonus from it
     #Better user experience so they don't have to calculate that
-    def ability_modifier(self, score):
+    def abilityModifier(self, score):
         """Calculate the ability modifier for a given ability score."""
         return (score - 10) // 2
 
     #So fo rthis one there's a lot going on
-    def skill_modifier(self, skill_name):
+    def skillModifier(self, skill_name):
         """
         Calculate skill modifier based on proficiency and associated ability score.
         """
