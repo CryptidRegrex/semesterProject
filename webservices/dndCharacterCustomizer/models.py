@@ -34,3 +34,29 @@ class Character(models.Model):
     proficiency_bonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)], help_text="Character level (1-20)")
     experience_points = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
+    
+    # Skills
+    # In this case we are going to let the player mark if they have said skill or not. 
+    # Using this later in the model to calculate the skil bonus like a +2 to athletics
+    athletics = models.BooleanField(default=False, help_text="Proficient in Athletics (Strength-based)")
+    #Dex based
+    acrobatics = models.BooleanField(default=False, help_text="Proficient in Acrobatics (Dexterity-based)")
+    sleight_of_hand = models.BooleanField(default=False, help_text="Proficient in Sleight of Hand (Dexterity-based)")
+    stealth = models.BooleanField(default=False, help_text="Proficient in Stealth (Dexterity-based)")
+    #Intelligence based
+    arcana = models.BooleanField(default=False, help_text="Proficient in Arcana (Intelligence-based)")
+    history = models.BooleanField(default=False, help_text="Proficient in History (Intelligence-based)")
+    investigation = models.BooleanField(default=False, help_text="Proficient in Investigation (Intelligence-based)")
+    nature = models.BooleanField(default=False, help_text="Proficient in Nature (Intelligence-based)")
+    religion = models.BooleanField(default=False, help_text="Proficient in Religion (Intelligence-based)")
+    #Wisdom based
+    animal_handling = models.BooleanField(default=False, help_text="Proficient in Animal Handling (Wisdom-based)")
+    insight = models.BooleanField(default=False, help_text="Proficient in Insight (Wisdom-based)")
+    medicine = models.BooleanField(default=False, help_text="Proficient in Medicine (Wisdom-based)")
+    perception = models.BooleanField(default=False, help_text="Proficient in Perception (Wisdom-based)")
+    survival = models.BooleanField(default=False, help_text="Proficient in Survival (Wisdom-based)")
+    #Charisma based
+    deception = models.BooleanField(default=False, help_text="Proficient in Deception (Charisma-based)")
+    intimidation = models.BooleanField(default=False, help_text="Proficient in Intimidation (Charisma-based)")
+    performance = models.BooleanField(default=False, help_text="Proficient in Performance (Charisma-based)")
+    persuasion = models.BooleanField(default=False, help_text="Proficient in Persuasion (Charisma-based)")
