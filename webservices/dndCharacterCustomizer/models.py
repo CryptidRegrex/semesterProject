@@ -13,7 +13,7 @@ class Character(models.Model):
     name = models.CharField(max_length=100)
     race = models.CharField(max_length=50, help_text="Character's race, e.g., Elf, Human, Dwarf")
     background = models.CharField(max_length=50, help_text="Character's background, e.g., Soldier, Noble")
-    char_class = models.CharField(max_length=50, help_text="Character's class, e.g., Fighter, Wizard, Rogue")
+    charClass = models.CharField(max_length=50, help_text="Character's class, e.g., Fighter, Wizard, Rogue")
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, help_text="Gender identity of the character")
 
     # Core Attributes
@@ -27,13 +27,13 @@ class Character(models.Model):
     # Secondary Attributes
     # To add some more color these will be the attributes the DM will be using and or modifying during a campaign 
     # Special permissions will want to be used for something like this
-    hit_points = models.IntegerField(validators=[MinValueValidator(0)], help_text="Current hit points")
-    max_hit_points = models.IntegerField(validators=[MinValueValidator(1)], help_text="Maximum hit points")
-    armor_class = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Armor Class (AC)")
+    hitPoints = models.IntegerField(validators=[MinValueValidator(0)], help_text="Current hit points")
+    maxHitPoints = models.IntegerField(validators=[MinValueValidator(1)], help_text="Maximum hit points")
+    armorClass = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Armor Class (AC)")
     speed = models.IntegerField(validators=[MinValueValidator(1)], help_text="Movement speed in feet per round")
-    proficiency_bonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
+    proficiencyBonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)], help_text="Character level (1-20)")
-    experience_points = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
+    experiencePoints = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
     
     # Skills
     # In this case we are going to let the player mark if they have said skill or not. 
@@ -41,7 +41,7 @@ class Character(models.Model):
     athletics = models.BooleanField(default=False, help_text="Proficient in Athletics (Strength-based)")
     #Dex based
     acrobatics = models.BooleanField(default=False, help_text="Proficient in Acrobatics (Dexterity-based)")
-    sleight_of_hand = models.BooleanField(default=False, help_text="Proficient in Sleight of Hand (Dexterity-based)")
+    sleightOfHand = models.BooleanField(default=False, help_text="Proficient in Sleight of Hand (Dexterity-based)")
     stealth = models.BooleanField(default=False, help_text="Proficient in Stealth (Dexterity-based)")
     #Intelligence based
     arcana = models.BooleanField(default=False, help_text="Proficient in Arcana (Intelligence-based)")
@@ -50,7 +50,7 @@ class Character(models.Model):
     nature = models.BooleanField(default=False, help_text="Proficient in Nature (Intelligence-based)")
     religion = models.BooleanField(default=False, help_text="Proficient in Religion (Intelligence-based)")
     #Wisdom based
-    animal_handling = models.BooleanField(default=False, help_text="Proficient in Animal Handling (Wisdom-based)")
+    animalHandling = models.BooleanField(default=False, help_text="Proficient in Animal Handling (Wisdom-based)")
     insight = models.BooleanField(default=False, help_text="Proficient in Insight (Wisdom-based)")
     medicine = models.BooleanField(default=False, help_text="Proficient in Medicine (Wisdom-based)")
     perception = models.BooleanField(default=False, help_text="Proficient in Perception (Wisdom-based)")
@@ -76,14 +76,14 @@ class Character(models.Model):
         skill_to_ability = {
             'athletics': self.strength,
             'acrobatics': self.dexterity,
-            'sleight_of_hand': self.dexterity,
+            'sleightOfHand': self.dexterity,
             'stealth': self.dexterity,
             'arcana': self.intelligence,
             'history': self.intelligence,
             'investigation': self.intelligence,
             'nature': self.intelligence,
             'religion': self.intelligence,
-            'animal_handling': self.wisdom,
+            'animalHandling': self.wisdom,
             'insight': self.wisdom,
             'medicine': self.wisdom,
             'perception': self.wisdom,
@@ -96,11 +96,16 @@ class Character(models.Model):
         
         # Get base modifier based on associated ability and then we set the bonus based on the core stat bonus
         ability_score = skill_to_ability.get(skill_name)
-        base_modifier = self.ability_modifier(ability_score)
+        base_modifier = self.abilityModifier(ability_score)
         
         # Add proficiency bonus if proficient in skill. We'll only calcuate that of abilities the user has
         if getattr(self, skill_name):
-            return base_modifier + self.proficiency_bonus
+            return base_modifier + self.proficiencyBonus
         return base_modifier
+    
+    # Thought returing some more information about the character would be neat.
+    def __str__(self):
+        return f"{self.name} - Level {self.level} {self.charClass} ({self.race})"
+    
     
     
