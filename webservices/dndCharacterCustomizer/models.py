@@ -23,3 +23,14 @@ class Character(models.Model):
     intelligence = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Intelligence (1-30)")
     wisdom = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Wisdom (1-30)")
     charisma = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Charisma (1-30)")
+    
+    # Secondary Attributes
+    # To add some more color these will be the attributes the DM will be using and or modifying during a campaign 
+    # Special permissions will want to be used for something like this
+    hit_points = models.IntegerField(validators=[MinValueValidator(0)], help_text="Current hit points")
+    max_hit_points = models.IntegerField(validators=[MinValueValidator(1)], help_text="Maximum hit points")
+    armor_class = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Armor Class (AC)")
+    speed = models.IntegerField(validators=[MinValueValidator(1)], help_text="Movement speed in feet per round")
+    proficiency_bonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
+    level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)], help_text="Character level (1-20)")
+    experience_points = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
