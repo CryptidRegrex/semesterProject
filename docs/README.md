@@ -27,6 +27,7 @@ As a **user**, I want to **reset my password** so that I can **set a new passwor
 
 **Acceptance Criteria**
 1. User can reset password based on the user having an existing account
+2. It will send an email to the existing user with a reset password link
 
 **Story 5**
 
