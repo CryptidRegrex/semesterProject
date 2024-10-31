@@ -14,6 +14,14 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
+class Campaign(models.Model):
+    name = models.CharField(max_length=100, help_text="Name of the campaign")
+    characters = models.ManyToManyField('Character', related_name='campaigns', blank=True, help_text="Characters participating in this campaign")
+
+    def __str__(self):
+        return self.name
+
+
 class Character(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
