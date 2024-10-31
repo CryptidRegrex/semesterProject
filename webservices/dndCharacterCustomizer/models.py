@@ -1,5 +1,18 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import BaseUserManager
+
+#Found that django have a build in user model that i can extend.
+class CustomUserManager(BaseUserManager):
+    def createUser(self, email, username, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field is required")
+        email = self.email.lower()
+        user = self.model(email=email, username=username, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
 
 class Character(models.Model):
     GENDER_CHOICES = [
