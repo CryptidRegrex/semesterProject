@@ -60,3 +60,47 @@ class Character(models.Model):
     intimidation = models.BooleanField(default=False, help_text="Proficient in Intimidation (Charisma-based)")
     performance = models.BooleanField(default=False, help_text="Proficient in Performance (Charisma-based)")
     persuasion = models.BooleanField(default=False, help_text="Proficient in Persuasion (Charisma-based)")
+    
+    #Essentially, like in D&D take the score -10 and get the bonus from it
+    #Better user experience so they don't have to calculate that
+    def ability_modifier(self, score):
+        """Calculate the ability modifier for a given ability score."""
+        return (score - 10) // 2
+
+    #So fo rthis one there's a lot going on
+    def skill_modifier(self, skill_name):
+        """
+        Calculate skill modifier based on proficiency and associated ability score.
+        """
+        #List of skills with the object's self value of the core stats in a key value pair
+        skill_to_ability = {
+            'athletics': self.strength,
+            'acrobatics': self.dexterity,
+            'sleight_of_hand': self.dexterity,
+            'stealth': self.dexterity,
+            'arcana': self.intelligence,
+            'history': self.intelligence,
+            'investigation': self.intelligence,
+            'nature': self.intelligence,
+            'religion': self.intelligence,
+            'animal_handling': self.wisdom,
+            'insight': self.wisdom,
+            'medicine': self.wisdom,
+            'perception': self.wisdom,
+            'survival': self.wisdom,
+            'deception': self.charisma,
+            'intimidation': self.charisma,
+            'performance': self.charisma,
+            'persuasion': self.charisma,
+        }
+        
+        # Get base modifier based on associated ability and then we set the bonus based on the core stat bonus
+        ability_score = skill_to_ability.get(skill_name)
+        base_modifier = self.ability_modifier(ability_score)
+        
+        # Add proficiency bonus if proficient in skill. We'll only calcuate that of abilities the user has
+        if getattr(self, skill_name):
+            return base_modifier + self.proficiency_bonus
+        return base_modifier
+    
+    
