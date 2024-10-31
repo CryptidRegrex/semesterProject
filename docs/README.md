@@ -119,3 +119,13 @@ https://attack.mitre.org/techniques/T1557/
 
 **Acceptance Criteria**
 1. Enable HTTPS on django
+
+**Story 4**
+
+As a **bad actor**, I want to **input bad data into data fields** so that I can **break or manipulate the system**
+
+**Notes**
+https://attack.mitre.org/mitigations/M0818/
+
+**Acceptance Criteria**
+1. Validate user input to insure injection, record corruption, or system breakage cannot occur.
