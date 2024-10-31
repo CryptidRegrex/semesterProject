@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Mount the app directory
+    ports:
+      - "8000:8000"  # Map port 8000 of the host to port 8000 of the container
+    depends_on:
+      - db  # Ensure that the db service starts before the web app
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres  # PostgreSQL database URL
+
+  db:
+    image: postgres:14  # Use the official PostgreSQL image
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/  # Persist database data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
