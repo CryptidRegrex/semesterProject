@@ -134,4 +134,4 @@ https://attack.mitre.org/mitigations/M0818/
 
 **Diagrams**
 
-![Project Screenshot](./images/Authenticated Index.drawio.png)
+![Project Screenshot](./images/AuthenticatedIndex.drawio.png)
