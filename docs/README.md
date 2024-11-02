@@ -129,3 +129,9 @@ https://attack.mitre.org/mitigations/M0818/
 
 **Acceptance Criteria**
 1. Validate user input to insure injection, record corruption, or system breakage cannot occur.
+
+
+
+**Diagrams**
+
+![Project Screenshot](./images/Authenticated Index.drawio.png)
