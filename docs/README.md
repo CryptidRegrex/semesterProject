@@ -134,4 +134,31 @@ https://attack.mitre.org/mitigations/M0818/
 
 **Diagrams**
 
-![Project Screenshot](./images/AuthenticatedIndex.drawio.png)
+![Index Page](./images/IndexPage.drawio.png)
+
+![Authenticated Index Page](./images/AuthenticatedIndex.drawio.png)
+
+![Login Page](./images/LoginPage.drawio.png)
+
+![Register Page](./images/RegisterPage.drawio.png)
+
+![User Page](./images/UserPage.drawio.png)
+
+![Character Design Page](./images/CharacterDesignPage.drawio.png)
+
+![Create Campaign Page](./images/CreateCampaign.drawio.png)
+
+
+**C4 Model**
+
+**System**
+
+![Authenticated Index Page](./images/SystemContextDND.drawio.png)
+
+**Container**
+
+![Authenticated Index Page](./images/Container.drawio.png)
+
+**Context**
+
+![Authenticated Index Page](./images/Multi-PageApplication.drawio.png)
