@@ -1,6 +1,11 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import BaseUserManager, AbstractUser
+
+
+class User(AbstractUser):
+    # Add any additional fields if needed
+    pass
 
 #Found that django have a build in user model that i can extend.
 class CustomUserManager(BaseUserManager):

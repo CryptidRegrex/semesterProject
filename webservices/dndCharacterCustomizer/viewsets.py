@@ -9,6 +9,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
     """
 
     # Specifying the serializer class to be used
+    queryset = Character.objects.all()
     serializer_class = CharacterSerializer
 
 

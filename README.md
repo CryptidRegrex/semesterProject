@@ -9,22 +9,23 @@ This project looks to do a few different things.
 7. A user can login to create chracters
 8. A user can create a campaign, relate characters to campaign, and edit stats of a character in a related campaign
 
+
 #Installation
-#First create the docker container
-docker build -t CharacterCreation .
-#Run the process
-docker run CharacterCreation
-#makemigration to postgres
-docker-compose run web python manage.py makemigrations
-#migrate the database
-docker-compose run web python manage.py migrate
-#compose and build the container again
-docker-compose up --build
+#First create the docker container 
+1. docker build -t CharacterCreation . 
+#Run the process 
+2. docker run CharacterCreation 
+#makemigration to postgres 
+3. docker-compose run web python manage.py makemigrations 
+#migrate the database 
+4. docker-compose run web python manage.py migrate 
 
 
 #Getting Started
-docker-compose up
+#This will start the service
+docker-compose up --build
 
+#Once app is completed you should see menu items for help and understanding
 
 #License
 The MIT License (MIT)
