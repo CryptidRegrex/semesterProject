@@ -3,20 +3,20 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 
 
-class User(AbstractUser):
-    # Add any additional fields if needed
-    pass
+# class User(AbstractUser):
+#     # Add any additional fields if needed
+#     pass
 
-#Found that django have a build in user model that i can extend.
-class CustomUserManager(BaseUserManager):
-    def createUser(self, email, username, password=None, **extra_fields):
-        if not email:
-            raise ValueError("The Email field is required")
-        email = self.email.lower()
-        user = self.model(email=email, username=username, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+# #Found that django have a build in user model that i can extend.
+# class CustomUserManager(BaseUserManager):
+#     def createUser(self, email, username, password=None, **extra_fields):
+#         if not email:
+#             raise ValueError("The Email field is required")
+#         email = self.email.lower()
+#         user = self.model(email=email, username=username, **extra_fields)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
 
 
 class Campaign(models.Model):
