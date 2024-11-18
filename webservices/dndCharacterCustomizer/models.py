@@ -1,22 +1,33 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import BaseUserManager, AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
+#from django.utils.translation import gettext_lazy as _
+
+# class CustomUserManger(BaseUserManager):
+    
 
 
-# class User(AbstractUser):
-#     # Add any additional fields if needed
-#     pass
 
-# #Found that django have a build in user model that i can extend.
-# class CustomUserManager(BaseUserManager):
-#     def createUser(self, email, username, password=None, **extra_fields):
-#         if not email:
-#             raise ValueError("The Email field is required")
-#         email = self.email.lower()
-#         user = self.model(email=email, username=username, **extra_fields)
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
+class User(AbstractUser):
+    # Roles
+    USER_TYPES = (
+        ("ADMIN", "Admin"),
+        ("AUTHORIZED", "Authorized"),
+    )
+        
+    type = models.CharField(
+        max_length=10, choices=USER_TYPES, default="Authorized"
+    )
+        
+    email = models.EmailField(unique=True, max_length=100)
+    username = models.CharField(unique=True, max_length=50)
+        
+    REQUIRED_FIELDS = ["email"]
+    
+
+    def __str__(self):
+        return self.username
 
 
 class Campaign(models.Model):
