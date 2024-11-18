@@ -2,11 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
-#from django.utils.translation import gettext_lazy as _
-
-# class CustomUserManger(BaseUserManager):
-    
-
 
 
 class User(AbstractUser):
@@ -31,6 +26,10 @@ class User(AbstractUser):
 
 
 class Campaign(models.Model):
+    
+    userOwner = models.ForeignKey(User,
+                               on_delete=models.CASCADE)
+    
     name = models.CharField(max_length=100, help_text="Name of the campaign")
     characters = models.ManyToManyField('Character', related_name='campaigns', blank=True, help_text="Characters participating in this campaign")
 
