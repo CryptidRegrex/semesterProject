@@ -1,28 +1,22 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.models import BaseUserManager, AbstractUser
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
 
 
-class User(AbstractUser):
-    # Roles
-    USER_TYPES = (
-        ("ADMIN", "Admin"),
-        ("AUTHORIZED", "Authorized"),
-    )
-        
-    type = models.CharField(
-        max_length=10, choices=USER_TYPES, default="Authorized"
-    )
-        
-    email = models.EmailField(unique=True, max_length=100)
-    username = models.CharField(unique=True, max_length=50)
-        
-    REQUIRED_FIELDS = ["email"]
+
+
+class profile(models.Model):
+    username = models.CharField(max_length=100)
+    # id (UUID)
+    # campaigns
+    # characters?
+    # build  
     
-
+    
     def __str__(self):
-        return self.username
+        return self.name
+
+
 
 
 class Campaign(models.Model):
