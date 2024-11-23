@@ -107,7 +107,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 #This was added so that we could use a custom user model
-AUTH_USER_MODEL = 'dndCharacterCustomizer.User'
+##AUTH_USER_MODEL = 'dndCharacterCustomizer.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

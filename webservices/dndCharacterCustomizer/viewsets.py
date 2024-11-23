@@ -3,31 +3,45 @@ from rest_framework.response import Response
 from .models import Character
 from .models import User
 from .serializers import CharacterSerializer
-from .serializers import UserSerializer
+from .serializers import UserRegistrationSerializer
 #This let's me set permissions based on the user type that's making the request
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """This contains the listings for creating a new user
 
-    Args:
-        viewsets (_type_): _description_
 
-    Returns:
-        _type_: _description_
-    """
+
+class UserRegistrationViewSet(viewsets.ModelViewSet):
+    def create(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {"message": "User registered successfully!", "username": user.username},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class UserViewSet(viewsets.ModelViewSet):
+#     """This contains the listings for creating a new user
+
+#     Args:
+#         viewsets (_type_): _description_
+
+#     Returns:
+#         _type_: _description_
+#     """
     
-    # Specifying the serializer class to be used
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+#     # Specifying the serializer class to be used
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
-    # Permissions: Only admin users can create, update, or delete users.
-    # Authenticated users can view their data (you can customize this further).
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsAdminUser()]  # Restrict these actions to admins
-        return [IsAuthenticated()]  # Authenticated users can view users
+#     # Permissions: Only admin users can create, update, or delete users.
+#     # Authenticated users can view their data (you can customize this further).
+#     def get_permissions(self):
+#         if self.action in ['create', 'update', 'partial_update', 'destroy']:
+#             return [IsAdminUser()]  # Restrict these actions to admins
+#         return [IsAuthenticated()]  # Authenticated users can view users
 
 class CharacterViewSet(viewsets.ModelViewSet):
     """

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Character
-from .models import User
+from django.contrib.auth.models import User
+from .models import Profile
 
 class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,13 +9,26 @@ class CharacterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # Default set to authorized, password we are ensuring this is a write only field. We ARE NOT GOING TO ALLOW READS FROM THIS FIELD
-# Security first LOL
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Include fields from the related Profile model
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password', 'type']
+        fields = ['username', 'password', 'email']
         extra_kwargs = {
-            'type': {'default': 'AUTHORIZED'}  
+            'password': {'write_only': True},  # Ensure the password is securely handled
         }
+
+    def create(self, validated_data):
+        # Extract email from validated data
+        email = validated_data.pop('email')
+
+        # Create the User
+        user = User.objects.create_user(**validated_data)
+
+        # Create a Profile with the extracted email and default type
+        Profile.objects.create(user=user, email=email, type="AUTHORIZED")
+
+        return user

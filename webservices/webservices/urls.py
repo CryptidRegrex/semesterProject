@@ -18,13 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from dndCharacterCustomizer.viewsets import CharacterViewSet
-from dndCharacterCustomizer.viewsets import UserViewSet
+from dndCharacterCustomizer.viewsets import UserRegistrationViewSet
+#from dndCharacterCustomizer.viewsets import UserViewSet
 #Will obtain the api key necessary to make a call to create a user
 from rest_framework.authtoken.views import obtain_auth_token
 
 router = DefaultRouter()
 router.register(r'characters', CharacterViewSet, basename='character')
-router.register(r'users', UserViewSet, basename='user')
+router.register(r'register', UserRegistrationViewSet, basename='user-registration')
+# router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
