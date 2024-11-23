@@ -22,27 +22,6 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class UserViewSet(viewsets.ModelViewSet):
-#     """This contains the listings for creating a new user
-
-#     Args:
-#         viewsets (_type_): _description_
-
-#     Returns:
-#         _type_: _description_
-#     """
-    
-#     # Specifying the serializer class to be used
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-
-#     # Permissions: Only admin users can create, update, or delete users.
-#     # Authenticated users can view their data (you can customize this further).
-#     def get_permissions(self):
-#         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-#             return [IsAdminUser()]  # Restrict these actions to admins
-#         return [IsAuthenticated()]  # Authenticated users can view users
-
 class CharacterViewSet(viewsets.ModelViewSet):
     """
     Viewset for creating, listing, updating, retrieving, and deleting Character instances.
