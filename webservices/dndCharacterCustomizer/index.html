@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Character Customerizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .box h2 {
+            margin-top: 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Character Customizer</h1>
+        <p>This site's purpose is for you to create 5e characters and campaign's related to those characters.</p>
+        <div class="grid">
+            <div class="box">
+                <h2>Feature 1</h2>
+                <p>Character Creation.</p>
+            </div>
+            <div class="box">
+                <h2>Feature 2</h2>
+                <p>Character Randomization.</p>
+            </div>
+            <div class="box">
+                <h2>Feature 3</h2>
+                <p>Campaign-Character management.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
