@@ -1,7 +1,26 @@
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from .models import Character
+from .models import User
 from .serializers import CharacterSerializer
+from .serializers import UserRegistrationSerializer
+#This let's me set permissions based on the user type that's making the request
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+
+
+
+
+class UserRegistrationViewSet(viewsets.ModelViewSet):
+    def create(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {"message": "User registered successfully!", "username": user.username},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CharacterViewSet(viewsets.ModelViewSet):
     """

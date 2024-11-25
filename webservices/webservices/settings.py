@@ -38,8 +38,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dndCharacterCustomizer',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+#This is required for the auth token
+#First, tells the authentication classes to use the one that comes with 
+#the django restframework package
+#The second list is the classes that have access to the auth token
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+    
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,9 +105,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
-#This was added so that we could use a custom user model
-AUTH_USER_MODEL = 'dndCharacterCustomizer.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
