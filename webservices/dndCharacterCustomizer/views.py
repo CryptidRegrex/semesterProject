@@ -1,7 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
-# from django.shortcuts import render
-
-# def index(request):
-#     return render(request, 'dndCharacterCustomizer/index.html')
+# Index view for the home page when I render the initial page
+def index(request):
+    return render(request, 'index.html')

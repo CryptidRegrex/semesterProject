@@ -22,6 +22,10 @@ from dndCharacterCustomizer.viewsets import UserRegistrationViewSet
 #from dndCharacterCustomizer.viewsets import UserViewSet
 #Will obtain the api key necessary to make a call to create a user
 from rest_framework.authtoken.views import obtain_auth_token
+from dndCharacterCustomizer import views
+from django.views.generic import RedirectView
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = DefaultRouter()
 router.register(r'characters', CharacterViewSet, basename='character')
@@ -31,6 +35,13 @@ router.register(r'register', UserRegistrationViewSet, basename='user-registratio
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    #path('index/', include('index.urls'))
+    #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
 ]
+
+urlpatterns += [
+    path('', RedirectView.as_view(url='dndCharacterCustomizer/',
+                                  permanent=True))
+]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
