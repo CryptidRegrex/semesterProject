@@ -19,7 +19,6 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from dndCharacterCustomizer.viewsets import CharacterViewSet
 from dndCharacterCustomizer.viewsets import UserRegistrationViewSet
-#from dndCharacterCustomizer.viewsets import UserViewSet
 #Will obtain the api key necessary to make a call to create a user
 from rest_framework.authtoken.views import obtain_auth_token
 from dndCharacterCustomizer import views
