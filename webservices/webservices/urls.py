@@ -25,6 +25,8 @@ from dndCharacterCustomizer import views
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
+from dndCharacterCustomizer.views import index, login, user_dashboard, logout_view, register_view
 
 router = DefaultRouter()
 router.register(r'characters', CharacterViewSet, basename='character')
@@ -32,15 +34,22 @@ router.register(r'register', UserRegistrationViewSet, basename='user-registratio
 # router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
+    path('', index, name='index'),
     path('admin/', admin.site.urls),
-    path('', include(router.urls)),
+    path('api', include(router.urls)),
+    path('login/', login, name='login'),
+    path('dashboard/', user_dashboard, name='user_dashboard'),
+    path('logout/', logout_view, name='logout'),
+    path('register/', register_view, name='register'),
     #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
+    #path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
+    #path('login/', TemplateView.as_view(template_name="login.html"), name="login"),
 ]
 
-urlpatterns += [
-    path('', RedirectView.as_view(url='dndCharacterCustomizer/',
-                                  permanent=True))
-]
+#urlpatterns += [
+    #path('', RedirectView.as_view(url='dndCharacterCustomizer/',
+   #                               permanent=True)),
+   # path('login/', LoginView.as_view(template_name='main/login.html'), name='login')
+#]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+#urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

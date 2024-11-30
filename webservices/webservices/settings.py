@@ -69,10 +69,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'webservices.urls'
 
+#Updated DIRS with my base dir
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "dndCharacterCustomizer/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
