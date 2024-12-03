@@ -46,16 +46,16 @@ INSTALLED_APPS = [
 #First, tells the authentication classes to use the one that comes with 
 #the django restframework package
 #The second list is the classes that have access to the auth token
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#     ],
     
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ]
     
-}
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,10 +69,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'webservices.urls'
 
+#Updated DIRS with my base dir
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "dndCharacterCustomizer/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

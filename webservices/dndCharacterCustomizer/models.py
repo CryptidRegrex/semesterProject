@@ -7,32 +7,32 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     # Link to the User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    
-    # id (UUID)
-    # campaigns
-    # characters?
-    # build  
 
     # Roles
-    USER_TYPES = (
+    USER_TYPES = [
         ("ADMIN", "Admin"),
         ("AUTHORIZED", "Authorized"),
-    )
+    ]
     type = models.CharField(max_length=10, choices=USER_TYPES, default="AUTHORIZED")
+    
+    #Just setting it here too. Maybe should remove later. 
     email = models.EmailField(unique=True, max_length=100)
+
+    # Relationships to the Character model and the Campaign model. These should be default blank. 
+    characters = models.ManyToManyField("Character", blank=True)
+    campaigns = models.ManyToManyField("Campaign", related_name="profile_campaigns", blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.type}"
 
 
-
 class Campaign(models.Model):
-    
-    userOwner = models.ForeignKey(Profile,
-                               on_delete=models.CASCADE)
-    
+    userOwner = models.ForeignKey(Profile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, help_text="Name of the campaign")
+
+    # Updated related_name
     characters = models.ManyToManyField('Character', related_name='campaigns', blank=True, help_text="Characters participating in this campaign")
+    profiles = models.ManyToManyField(Profile, related_name="campaign_profiles", blank=True)  
 
     def __str__(self):
         return self.name
@@ -45,6 +45,9 @@ class Character(models.Model):
         ('NB', 'Non-Binary'),
         ('O', 'Other'),
     ]
+
+    # Many-to-many relationship to Profile (for the owners of this character)
+    profiles = models.ManyToManyField('Profile', related_name='owners', blank=True)
     
     # Basic Info
     name = models.CharField(max_length=100)
@@ -60,7 +63,7 @@ class Character(models.Model):
     intelligence = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Intelligence (1-30)")
     wisdom = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Wisdom (1-30)")
     charisma = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Charisma (1-30)")
-    
+
     # Secondary Attributes
     # To add some more color these will be the attributes the DM will be using and or modifying during a campaign 
     # Special permissions will want to be used for something like this
