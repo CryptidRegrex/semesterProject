@@ -1,32 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Dashboard</title>
-</head>
-<body>
-    <h1>Welcome, {{ profile.user.username }}!</h1>
+<!-- Display Character and Campaigns -->
+<h2>Your Characters</h2>
+{% if characters != "No Characters" %}
+    <ul>
+    {% for character in characters %}
+        <li>{{ character.name }} - Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Characters</p>
+{% endif %}
 
-    <h2>Campaigns</h2>
-    {% if campaigns %}
-        <ul>
-            {% for campaign in campaigns %}
-                <li>{{ campaign.name }}</li> 
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>{{ campaigns_message }}</p>
-    {% endif %}
+<h2>Your Campaigns</h2>
+{% if campaigns != "No Campaigns" %}
+    <ul>
+    {% for campaign in campaigns %}
+        <li>{{ campaign.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Campaigns</p>
+{% endif %}
 
-    <h2>Characters</h2>
-    {% if characters %}
-        <ul>
-            {% for character in characters %}
-                <li>{{ character.name }}</li>  
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>{{ characters_message }}</p>
-    {% endif %}
+<!-- Form to create new Character -->
+<h2>Create New Character</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ character_form.as_p }}
+    <button type="submit" name="create_character">Create Character</button>
+</form>
 
-</body>
-</html>
+<!-- Form to create new Campaign -->
+<h2>Create New Campaign</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ campaign_form.as_p }}
+    <button type="submit" name="create_campaign">Create Campaign</button>
+</form>

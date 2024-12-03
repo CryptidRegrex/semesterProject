@@ -9,6 +9,8 @@ from .models import Profile, Character, Campaign
 #used within login_view definition
 from django.contrib.auth import authenticate, login as auth_login
 
+from .forms import CharacterForm, CampaignForm
+
 # Index view for the home page when I render the initial page
 def index(request):
     num_visits = request.session.get('num_visits', 0)
@@ -43,24 +45,49 @@ def user_dashboard(request):
     # Get the Profile of the logged-in user
     profile = Profile.objects.get(user=request.user)
     
-    # Get related Campaigns and Characters
+    # Get all related Campaigns and Characters
     campaigns = profile.campaigns.all()
-    characters = profile.owners.all()  # Access characters via the related_name 'owners'
-    
+    characters = profile.owners.all() 
+
     # Check if no campaigns or characters exist and set fallback messages
     campaigns_message = "No Campaigns" if not campaigns else None
     characters_message = "No Characters" if not characters else None
     
-    # Pass this information to the template
+    # Handle creating a new Character
+    if request.method == "POST":
+        if 'create_character' in request.POST:
+            character_form = CharacterForm(request.POST)
+            if character_form.is_valid():
+                new_character = character_form.save(commit=False)
+                new_character.save()  # Save the character to postgresql
+                
+                # Associate the new character with the logged-in user
+                new_character.profiles.add(profile)
+                return redirect('user_dashboard')  # Redirect to the dashboard after saving
+        elif 'create_campaign' in request.POST:
+            campaign_form = CampaignForm(request.POST)
+            if campaign_form.is_valid():
+                new_campaign = campaign_form.save(commit=False)
+                new_campaign.save()  # Save the campaign to postgresql
+                
+                # Associate the new campaign with the logged-in user
+                new_campaign.profiles.add(profile)
+                return redirect('user_dashboard')  # Redirect to the dashboard after saving
+
+    # Forms to create new characters and campaigns
+    character_form = CharacterForm()
+    campaign_form = CampaignForm()
+
+    # Pass the context information to the templates
     context = {
         'profile': profile,
         'campaigns': campaigns,
         'characters': characters,
-        'campaigns_message': campaigns_message,
-        'characters_message': characters_message,
+        'character_form': character_form,
+        'campaign_form': campaign_form
     }
-    
     return render(request, 'dashboard.html', context)
+
 
 def logout_view(request):
     logout(request)  # Log out the user
