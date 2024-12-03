@@ -1,13 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
 </head>
 <body>
-    <h1>Welcome, {{ user.username }}!</h1>
-    <p>You are now logged in.</p>
-    <a href="{% url 'logout' %}">Logout</a>
+    <h1>Welcome, {{ profile.user.username }}!</h1>
+
+    <h2>Campaigns</h2>
+    {% if campaigns %}
+        <ul>
+            {% for campaign in campaigns %}
+                <li>{{ campaign.name }}</li> 
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{{ campaigns_message }}</p>
+    {% endif %}
+
+    <h2>Characters</h2>
+    {% if characters %}
+        <ul>
+            {% for character in characters %}
+                <li>{{ character.name }}</li>  
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{{ characters_message }}</p>
+    {% endif %}
+
 </body>
 </html>

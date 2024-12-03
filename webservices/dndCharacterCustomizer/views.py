@@ -4,6 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .models import Profile, Character, Campaign
+#This took forever to figure out. Essentially we are going to call django's native login() function and we are going to rename it to make it clear what it is
+#used within login_view definition
+from django.contrib.auth import authenticate, login as auth_login
 
 # Index view for the home page when I render the initial page
 def index(request):
@@ -15,29 +19,54 @@ def index(request):
     }
     return render(request, 'index.html', context=context)
 
-# This will render the login.html page so user's can attempt to authenticate to the application
-def login(request):
+# This will render the login.html page so users can attempt to authenticate to the application
+def login_view(request):
+    #Based on the request we'll authenticate 
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            login(request, user)  # Log the user in
-            return redirect("user_dashboard")  # Redirect to the user's dashboard or another page
+            auth_login(request, user)  # Use Django's built-in login function
+            return redirect("user_dashboard")  # Redirect to the user's dashboard
         else:
             return render(request, "login.html", {"error": "Invalid username or password."})
     
     return render(request, "login.html")
 
+#Using the decorator to make is simple
+#If a user tries to access this page without authentication it will redirect them
+#If the user IS logged in it will execute the definition
 @login_required
 def user_dashboard(request):
-    return render(request, "dashboard.html")
+    # Get the Profile of the logged-in user
+    profile = Profile.objects.get(user=request.user)
+    
+    # Get related Campaigns and Characters
+    campaigns = profile.campaigns.all()
+    characters = profile.owners.all()  # Access characters via the related_name 'owners'
+    
+    # Check if no campaigns or characters exist and set fallback messages
+    campaigns_message = "No Campaigns" if not campaigns else None
+    characters_message = "No Characters" if not characters else None
+    
+    # Pass this information to the template
+    context = {
+        'profile': profile,
+        'campaigns': campaigns,
+        'characters': characters,
+        'campaigns_message': campaigns_message,
+        'characters_message': characters_message,
+    }
+    
+    return render(request, 'dashboard.html', context)
 
 def logout_view(request):
     logout(request)  # Log out the user
     return redirect("login")  # Redirect to login page
 
+#To note here the signal will process the creation of a profile record. 
 def register_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -70,3 +99,15 @@ def register_view(request):
         return redirect("login")
     
     return render(request, "register.html")
+
+# Add a character to a user's profile
+def add_character_to_profile(user, character_id):
+    profile = user.profile
+    character = Character.objects.get(id=character_id)
+    profile.characters.add(character)
+
+# Add a campaign to a user's profile
+def add_campaign_to_profile(user, campaign_id):
+    profile = user.profile
+    campaign = Campaign.objects.get(id=campaign_id)
+    profile.campaigns.add(campaign)
