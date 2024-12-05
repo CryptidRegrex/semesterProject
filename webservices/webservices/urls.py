@@ -41,7 +41,7 @@ urlpatterns = [
     path('dashboard/', user_dashboard, name='user_dashboard'),
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
-    path('campaign/<int:campaign_id>/character/<int:character_id>/update/', update_character, name='update_character'),
+    path('character/<int:character_id>/update/', update_character, name='update_character'),
     #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     #path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
     #path('login/', TemplateView.as_view(template_name="login.html"), name="login"),

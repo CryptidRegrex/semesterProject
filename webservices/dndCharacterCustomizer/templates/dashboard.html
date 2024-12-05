@@ -1,18 +1,34 @@
 <!-- Display Character and Campaigns -->
-<h2>Your Characters</h2>
-{% if characters.exists %}
-    <ul>
-        {% for character in characters %}
-            <li>
-                {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
-                <form method="GET" action="{% url 'update_character' character.campaigns.first.id character.id %}">
-                    <button type="submit">Update Character</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+<h2>Your Created Characters</h2>
+{% if created_characters_message %}
+    <p>{{ created_characters_message }}</p>
 {% else %}
-    <p>No Characters</p>
+    <ul>
+    {% for character in created_characters %}
+        <li>
+            {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
+            <form method="GET" action="{% url 'update_character' character.id %}">
+                <button type="submit">Update</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<h2>Characters Associated with Your Campaigns</h2>
+{% if associated_characters_message %}
+    <p>{{ associated_characters_message }}</p>
+{% else %}
+    <ul>
+    {% for character in associated_characters %}
+        <li>
+            {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
+            <form method="GET" action="{% url 'update_character' character.id %}">
+                <button type="submit">Update</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
 {% endif %}
 
 <h2>Your Campaigns</h2>

@@ -49,19 +49,27 @@ from .models import Profile, Campaign, Character
 def user_dashboard(request):
     profile = Profile.objects.get(user=request.user)
     
-    # Get campaigns and characters associated with the user
-    campaigns = profile.campaign_profiles.all()
-    characters = profile.owners.all()
+    # Campaigns owned by the user
+    owned_campaigns = profile.campaign_profiles.all()
+    
+    # Characters created by the user
+    created_characters = profile.owners.all()
+
+    # Characters associated with campaigns owned by the user but not created by the user
+    associated_characters = Character.objects.filter(
+        campaigns__userOwner=profile  # Characters in campaigns owned by the user
+    ).exclude(profiles=profile)  # Exclude characters owned by the user
 
     # Messages for empty data
-    campaigns_message = "No Campaigns" if not campaigns else None
-    characters_message = "No Characters" if not characters else None
+    campaigns_message = "No Campaigns" if not owned_campaigns else None
+    created_characters_message = "No Created Characters" if not created_characters else None
+    associated_characters_message = "No Associated Characters" if not associated_characters else None
 
     # Initialize forms
     character_form = CharacterForm()
     campaign_form = CampaignForm()
     token_form = AccessTokenForm()
-    token_form.fields['character'].queryset = characters  # Limit character choices to the user's characters
+    token_form.fields['character'].queryset = created_characters
 
     if request.method == "POST":
         if 'create_character' in request.POST:  # Create a new character
@@ -83,7 +91,7 @@ def user_dashboard(request):
         
         elif 'submit_token' in request.POST:  # Handle access token submission
             token_form = AccessTokenForm(request.POST)
-            token_form.fields['character'].queryset = characters  # Limit character choices to user's characters
+            token_form.fields['character'].queryset = created_characters  # Limit character choices to user's characters
             if token_form.is_valid():
                 access_token = token_form.cleaned_data['access_token']
                 character = token_form.cleaned_data['character']
@@ -94,8 +102,8 @@ def user_dashboard(request):
                     campaign.characters.add(character)
                     campaign.save()
 
-                    # Grant the campaign owner access to the character
-                    campaign.userOwner.owners.add(character)
+                    # # Grant the campaign owner access to the character
+                    # campaign.userOwner.owners.add(character)
 
                     messages.success(request, f"{character.name} has been added to the campaign: {campaign.name}.")
                 else:
@@ -104,10 +112,12 @@ def user_dashboard(request):
 
     return render(request, 'dashboard.html', {
         'profile': profile,
-        'campaigns': campaigns,
-        'characters': characters,
+        'campaigns': owned_campaigns,
+        'created_characters': created_characters,
+        'associated_characters': associated_characters,
         'campaigns_message': campaigns_message,
-        'characters_message': characters_message,
+        'created_characters_message': created_characters_message,
+        'associated_characters_message': associated_characters_message,
         'character_form': character_form,
         'campaign_form': campaign_form,
         'token_form': token_form,
@@ -115,28 +125,27 @@ def user_dashboard(request):
 
 
 @login_required
-def update_character(request, campaign_id, character_id):
-    # Fetch the campaign and ensure the logged-in user is the owner
-    campaign = get_object_or_404(Campaign, id=campaign_id)
-    if campaign.userOwner.user != request.user:
-        return HttpResponseForbidden("You do not have permission to update this character.")
+def update_character(request, character_id):
+    # Fetch the character
+    character = get_object_or_404(Character, id=character_id)
 
-    # Fetch the character and ensure it's part of the campaign
-    character = get_object_or_404(Character, id=character_id, campaigns=campaign)
+    # Check if the user has permission to update the character
+    profile = Profile.objects.get(user=request.user)
+    if not character.profiles.filter(id=profile.id).exists():
+        return HttpResponseForbidden("You do not have permission to update this character.")
 
     if request.method == "POST":
         form = UpdateCharacterForm(request.POST, instance=character)
         if form.is_valid():
             form.save()
             messages.success(request, f"Character '{character.name}' updated successfully.")
-            return redirect('user_dashboard')  # Redirect to the dashboard or campaign page
+            return redirect('user_dashboard')
     else:
         form = UpdateCharacterForm(instance=character)
 
     return render(request, 'update_character.html', {
         'form': form,
         'character': character,
-        'campaign': campaign,
     })
 
 
