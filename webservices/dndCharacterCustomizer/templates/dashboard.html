@@ -1,10 +1,15 @@
 <!-- Display Character and Campaigns -->
 <h2>Your Characters</h2>
-{% if characters != "No Characters" %}
+{% if characters.exists %}
     <ul>
-    {% for character in characters %}
-        <li>{{ character.name }} - Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</li>
-    {% endfor %}
+        {% for character in characters %}
+            <li>
+                {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
+                <form method="GET" action="{% url 'update_character' character.campaigns.first.id character.id %}">
+                    <button type="submit">Update Character</button>
+                </form>
+            </li>
+        {% endfor %}
     </ul>
 {% else %}
     <p>No Characters</p>
@@ -14,12 +19,18 @@
 {% if campaigns != "No Campaigns" %}
     <ul>
     {% for campaign in campaigns %}
-        <li>{{ campaign.name }}</li>
+        <li>
+            {{ campaign.name }}
+            {% if campaign.userOwner == profile %}
+                (Access Token: {{ campaign.access_token }})
+            {% endif %}
+        </li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No Campaigns</p>
 {% endif %}
+
 
 <!-- Form to create new Character -->
 <h2>Create New Character</h2>
@@ -35,4 +46,12 @@
     {% csrf_token %}
     {{ campaign_form.as_p }}
     <button type="submit" name="create_campaign">Create Campaign</button>
+</form>
+
+<!-- Form to create relationship between a character and campaign -->
+<h2>Join a Campaign</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ token_form.as_p }}
+    <button type="submit" name="submit_token">Join Campaign</button>
 </form>

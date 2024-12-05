@@ -2,6 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
+#Using this for special access token to campaign
+import uuid
 
 
 class Profile(models.Model):
@@ -29,10 +31,10 @@ class Profile(models.Model):
 class Campaign(models.Model):
     userOwner = models.ForeignKey(Profile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, help_text="Name of the campaign")
-
-    # Updated related_name
     characters = models.ManyToManyField('Character', related_name='campaigns', blank=True, help_text="Characters participating in this campaign")
     profiles = models.ManyToManyField(Profile, related_name="campaign_profiles", blank=True)  
+    #Access token for a campaign owner to pass to a player in their campaign
+    access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Auto-generated access token
 
     def __str__(self):
         return self.name
