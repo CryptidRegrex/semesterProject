@@ -1,3 +1,6 @@
+#Using the decorator to make is simple
+#If a user tries to access this page without authentication it will redirect them
+#If the user IS logged in it will execute the definition
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -8,7 +11,8 @@ from .models import Profile, Character, Campaign
 #used within login_view definition
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import Http404
-from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm
+from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm
+import random
 
 # Index view for the home page when I render the initial page
 def index(request):
@@ -36,20 +40,67 @@ def login_view(request):
     
     return render(request, "login.html")
 
-#Using the decorator to make is simple
-#If a user tries to access this page without authentication it will redirect them
-#If the user IS logged in it will execute the definition
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .forms import CharacterForm, CampaignForm, AccessTokenForm, UpdateCharacterForm
-from .models import Profile, Campaign, Character
+@login_required
+def character_detail(request, character_id):
+    # Get the character, ensuring it belongs to the logged-in user
+    character = get_object_or_404(Character, id=character_id, profiles__user=request.user)
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Profile, Character, Campaign
-from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm
+    # Initialize forms
+    image_upload_form = CharacterImageUploadForm(instance=character)
+    update_character_form = UpdateCharacterForm(instance=character)
+
+    if request.method == "POST":
+        if "upload_image" in request.POST:
+            # Handle image upload
+            image_upload_form = CharacterImageUploadForm(request.POST, request.FILES, instance=character)
+            if image_upload_form.is_valid():
+                image_upload_form.save()
+                messages.success(request, "Image uploaded successfully!")
+            else:
+                messages.error(request, "Failed to upload image. Please try again.")
+        elif "delete_image" in request.POST:
+            # Handle image deletion
+            if character.image:
+                character.image.delete()  # Deletes the file from storage
+                character.image = None
+                character.save()
+                messages.success(request, "Image deleted successfully!")
+            else:
+                messages.error(request, "No image to delete.")
+        elif "update_character" in request.POST:
+            # Handle character update
+            update_character_form = UpdateCharacterForm(request.POST, instance=character)
+            if update_character_form.is_valid():
+                update_character_form.save()
+                messages.success(request, f"Character '{character.name}' updated successfully.")
+            else:
+                messages.error(request, "Failed to update character. Please fix the errors below.")
+        elif "join_campaign" in request.POST:
+            # Handle joining a campaign
+            campaign_token = request.POST.get("campaign_token")
+            campaign = Campaign.objects.filter(access_token=campaign_token).first()
+            if campaign:
+                if campaign not in character.campaigns.all():
+                    character.campaigns.add(campaign)
+                    messages.success(request, f"Character '{character.name}' successfully joined the campaign '{campaign.name}'.")
+                else:
+                    messages.info(request, f"Character '{character.name}' is already part of the campaign '{campaign.name}'.")
+            else:
+                messages.error(request, "Invalid campaign token. Please try again.")
+        return redirect("character_detail", character_id=character.id)
+
+    # Fetch campaigns the character is part of
+    campaigns = character.campaigns.all()
+
+    return render(request, "character_detail.html", {
+        "character": character,
+        "image_upload_form": image_upload_form,
+        "update_character_form": update_character_form,
+        "campaigns": campaigns,
+    })
+
+
+
 
 @login_required
 def user_dashboard(request):
@@ -71,17 +122,17 @@ def user_dashboard(request):
     created_characters_message = "No Created Characters" if not created_characters else None
     associated_characters_message = "No Associated Characters" if not associated_characters else None
 
+    # Initialize forms
+    character_form = CharacterForm()
+    campaign_form = CampaignForm()
+    token_form = AccessTokenForm()
+    token_form.fields['character'].queryset = created_characters
+
     # Prepare image upload forms for each created character
     character_image_forms = [
         (character, CharacterImageUploadForm(instance=character))
         for character in created_characters
     ]
-
-    # Initialize other forms
-    character_form = CharacterForm()
-    campaign_form = CampaignForm()
-    token_form = AccessTokenForm()
-    token_form.fields['character'].queryset = created_characters
 
     if request.method == "POST":
         if 'create_character' in request.POST:  # Create a new character
@@ -91,6 +142,14 @@ def user_dashboard(request):
                 new_character.save()
                 new_character.profiles.add(profile)  # Associate with the user's profile
                 return redirect('user_dashboard')
+
+        elif 'randomize_character' in request.POST:
+            randomized_data = randomize_character()
+            new_character = Character.objects.create(**randomized_data)
+            new_character.profiles.add(profile)
+            new_character.save()
+            messages.success(request, f"Character '{new_character.name}' created successfully!")
+            return redirect('user_dashboard')
         
         elif 'create_campaign' in request.POST:  # Create a new campaign
             campaign_form = CampaignForm(request.POST)
@@ -118,30 +177,24 @@ def user_dashboard(request):
                     messages.info(request, f"The character is already part of the campaign: {campaign.name}.")
                 return redirect('user_dashboard')
 
-        #ChatGPT helped with this feature
         elif 'upload_image' in request.POST:  # Handle image upload
-            character_id = request.POST.get('character_id')
+            character_id = request.POST.get('character_id')  # Get the character ID
             character = get_object_or_404(Character, id=character_id, profiles=profile)
             form = CharacterImageUploadForm(request.POST, request.FILES, instance=character)
             if form.is_valid():
-                form.save()  # Save the uploaded image
+                form.save()  # Save the form if valid
                 messages.success(request, f"Image uploaded for character '{character.name}'.")
             else:
                 messages.error(request, f"Failed to upload image: {form.errors}")
             return redirect('user_dashboard')
-
-        elif 'delete_image' in request.POST:  # Handle image deletion
+        
+        elif 'delete_character' in request.POST:  # Handle character deletion
             character_id = request.POST.get('character_id')
             character = get_object_or_404(Character, id=character_id, profiles=profile)
-            if character.image:
-                character.image.delete()  # Delete the image file
-                character.image = None
-                character.save()
-                messages.success(request, f"Image deleted for character '{character.name}'.")
-            else:
-                messages.info(request, f"No image to delete for character '{character.name}'.")
+            character.delete()
+            messages.success(request, f"Character '{character.name}' has been deleted.")
             return redirect('user_dashboard')
-            
+
     return render(request, 'dashboard.html', {
         'profile': profile,
         'campaigns': owned_campaigns,
@@ -153,7 +206,7 @@ def user_dashboard(request):
         'character_form': character_form,
         'campaign_form': campaign_form,
         'token_form': token_form,
-        'character_image_forms': character_image_forms,  
+        'character_image_forms': character_image_forms,  # Pass image forms to template
     })
 
 
@@ -234,3 +287,30 @@ def add_campaign_to_profile(user, campaign_id):
     profile = user.profile
     campaign = Campaign.objects.get(id=campaign_id)
     profile.campaigns.add(campaign)
+
+
+#Helper methods
+def randomize_character():
+    races = ["Human", "Elf", "Dwarf", "Halfling", "Dragonborn", "Tiefling", "Gnome", "Half-Orc", "Half-Elf"]
+    backgrounds = ["Soldier", "Noble", "Urchin", "Sage", "Criminal", "Folk Hero"]
+    classes = ["Fighter", "Wizard", "Rogue", "Cleric", "Paladin", "Ranger", "Bard"]
+    ability_scores = sorted([random.randint(3, 18) for _ in range(6)], reverse=True)  # Randomly roll six scores
+    
+    return {
+        "name": f"Random Character {random.randint(1, 1000)}",
+        "race": random.choice(races),
+        "background": random.choice(backgrounds),
+        "charClass": random.choice(classes),
+        "strength": ability_scores[0],
+        "dexterity": ability_scores[1],
+        "constitution": ability_scores[2],
+        "intelligence": ability_scores[3],
+        "wisdom": ability_scores[4],
+        "charisma": ability_scores[5],
+        "hitPoints": random.randint(5, 15),  # Example starting range
+        "maxHitPoints": random.randint(10, 20),
+        "armorClass": random.randint(10, 18),
+        "speed": 30,  # Standard speed for most characters
+        "proficiencyBonus": 2,  # Default for level 1
+        "level": 1,  # Start at level 1
+    }

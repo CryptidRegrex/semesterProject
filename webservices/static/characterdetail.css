@@ -1,0 +1,360 @@
+/* Some help from ChatGPT on styling like navbar and containers */
+
+/* Global styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Light gray background */
+    color: #333; /* Dark text */
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    color: #343a40; /* Darker gray for headings */
+    margin-top: 0;
+    font-family: 'Verdana', sans-serif;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 20px;
+    display: flex;
+    gap: 30px;
+    background-color: #fff; /* White background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Navigation Bar */
+.navigation-bar {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.navigation-bar .btn {
+    background-color: #007BFF;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+}
+
+.navigation-bar .btn:hover {
+    background-color: #0056b3;
+}
+
+.navigation-bar .btn-secondary {
+    background-color: #6c757d;
+}
+
+.navigation-bar .btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Left Column Styles */
+.left-column {
+    flex: 1.5;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.left-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.left-column ul li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.left-column ul li strong {
+    color: #495057; /* Medium gray for labels */
+}
+
+h2 {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007BFF; /* Blue underline */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Right Column Styles */
+.right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.character-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef; /* Light gray */
+    color: #6c757d; /* Medium gray text */
+    font-size: 16px;
+    border-radius: 15px;
+    border: 2px dashed #6c757d;
+}
+
+/* Form Styles */
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+input[type="file"] {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%;
+    cursor: pointer;
+    background-color: #f8f9fa;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+input[type="file"]:before {
+    content: 'Choose File';
+    display: inline-block;
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+input[type="file"]:hover:before {
+    background-color: #0056b3;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Danger button styling (delete button) */
+.btn-danger {
+    background-color: #dc3545; /* Red color */
+}
+
+.btn-danger:hover {
+    background-color: #a71d2a; /* Darker red for hover */
+}
+
+.logout-btn {
+    background-color: #d9534f; /* Red color */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c; /* Darker red */
+}
+
+.character-detail {
+    display: grid;
+    grid-template-columns: 4fr 2fr; /* Adjust the columns to give more space to the left column */
+    gap: 20px;
+    margin: 20px;
+}
+
+.character-info, .character-update, .character-image {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.character-info h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.character-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.campaigns-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.campaigns-section h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.campaigns-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.campaigns-section li {
+    font-size: 16px;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+
+.join-campaign-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.join-campaign-section h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #343a40;
+}
+
+.join-campaign-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.join-campaign-section label {
+    font-size: 14px;
+    color: #495057;
+}
+
+.join-campaign-section input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.join-campaign-section button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.join-campaign-section button:hover {
+    background-color: #0056b3;
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .left-column {
+        border-right: none;
+        padding-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .right-column {
+        align-items: stretch;
+    }
+
+    .character-image, .placeholder {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    form input[type="file"] {
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
