@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ character.name }} - Details</title>
+    <link rel="stylesheet" href="{% static 'characterdetail.css' %}">
+</head>
+<body>
+
+<!-- Navigation Buttons -->
+<div class="navigation-bar">
+    <a href="{% url 'user_dashboard' %}" class="btn">Back to Dashboard</a>
+    <a href="{% url 'index' %}" class="btn btn-secondary">Home</a>
+    <a href="{% url 'logout' %}" class="btn logout-btn">Logout</a>
+</div>
+
+<div class="container">
+
+<div class="join-campaign-section">
+    <h2>Join a Campaign</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="campaign_token">Campaign Token:</label>
+        <input type="text" id="campaign_token" name="campaign_token" placeholder="Enter campaign token" required>
+        <button type="submit" name="join_campaign" class="btn btn-primary">Join Campaign</button>
+    </form>
+</div>
+
+
+<div class="campaigns-section">
+    <h2>Campaigns</h2>
+    {% if campaigns %}
+        <ul>
+            {% for campaign in campaigns %}
+                <li>{{ campaign.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This character is not part of any campaigns.</p>
+    {% endif %}
+</div>
+
+</div>
+
+<div class="container">
+
+
+
+    <!-- Left Column: Character Details -->
+    <div class="left-column">
+        <h1>{{ character.name }}</h1>
+        <ul>
+            <li><strong>Race:</strong> {{ character.race }}</li>
+            <li><strong>Class:</strong> {{ character.charClass }}</li>
+            <li><strong>Background:</strong> {{ character.background }}</li>
+            <li><strong>Gender:</strong> {{ character.get_gender_display }}</li>
+            <li><strong>Level:</strong> {{ character.level }}</li>
+            <li><strong>Strength:</strong> {{ character.strength }}</li>
+            <li><strong>Dexterity:</strong> {{ character.dexterity }}</li>
+            <li><strong>Constitution:</strong> {{ character.constitution }}</li>
+            <li><strong>Intelligence:</strong> {{ character.intelligence }}</li>
+            <li><strong>Wisdom:</strong> {{ character.wisdom }}</li>
+            <li><strong>Charisma:</strong> {{ character.charisma }}</li>
+            <li><strong>Hit Points:</strong> {{ character.hitPoints }}/{{ character.maxHitPoints }}</li>
+            <li><strong>Armor Class:</strong> {{ character.armorClass }}</li>
+            <li><strong>Speed:</strong> {{ character.speed }}</li>
+            <li><strong>Proficiency Bonus:</strong> {{ character.proficiencyBonus }}</li>
+        </ul>
+        
+        <h2>Skills</h2>
+        <ul>
+            <li>
+                <strong>Athletics (Strength-based):</strong>
+                {% if character.athletics %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Acrobatics (Dexterity-based):</strong>
+                {% if character.acrobatics %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Sleight of Hand (Dexterity-based):</strong>
+                {% if character.sleightOfHand %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Stealth (Dexterity-based):</strong>
+                {% if character.stealth %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Arcana (Intelligence-based):</strong>
+                {% if character.arcana %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>History (Intelligence-based):</strong>
+                {% if character.history %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Investigation (Intelligence-based):</strong>
+                {% if character.investigation %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Nature (Intelligence-based):</strong>
+                {% if character.nature %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Religion (Intelligence-based):</strong>
+                {% if character.religion %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Animal Handling (Wisdom-based):</strong>
+                {% if character.animalHandling %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Insight (Wisdom-based):</strong>
+                {% if character.insight %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Medicine (Wisdom-based):</strong>
+                {% if character.medicine %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Perception (Wisdom-based):</strong>
+                {% if character.perception %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Survival (Wisdom-based):</strong>
+                {% if character.survival %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Deception (Charisma-based):</strong>
+                {% if character.deception %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Intimidation (Charisma-based):</strong>
+                {% if character.intimidation %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Performance (Charisma-based):</strong>
+                {% if character.performance %}Yes{% else %}No{% endif %}
+            </li>
+            <li>
+                <strong>Persuasion (Charisma-based):</strong>
+                {% if character.persuasion %}Yes{% else %}No{% endif %}
+            </li>
+        </ul>
+    </div>
+
+    <div class="character-update">
+        <h2>Update Character</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ update_character_form.as_p }}
+            <button type="submit" name="update_character" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Right Column: Character Image -->
+    <div class="right-column">
+        {% if character.image %}
+            <img src="{{ character.image.url }}" alt="{{ character.name }}" class="character-image">
+            <form method="POST" style="margin-top: 10px;">
+                {% csrf_token %}
+                <input type="hidden" name="delete_image" value="1">
+                <button type="submit" class="btn btn-danger">Delete Image</button>
+            </form>
+        {% else %}
+            <div class="placeholder">No Image</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" style="margin-top: 10px;">
+            {% csrf_token %}
+            {{ image_upload_form.as_p }}
+            <button type="submit" name="upload_image" class="btn">Upload Image</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

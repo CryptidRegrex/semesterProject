@@ -9,12 +9,18 @@
     <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
+    
+    <div class="navigation-buttons">
+        <a href="{% url 'index' %}" class="btn btn-secondary">Home</a>
+    </div>
+    
     <div class="container">
         <!-- Dashboard Header -->
         <header class="dashboard-header">
             <h1>Welcome, {{ profile.user.username }}</h1>
             <p class="subtitle">Manage your characters and campaigns from here.</p>
         </header>
+
 
         <!-- Characters Section -->
         <section>
@@ -32,7 +38,7 @@
                                 <h3>{{ character.name }}</h3>
                                 <p>Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</p>
                                 
-                                <!-- Image Upload Form -->
+                                <!-- Image Upload Form ChatGPT helped with the onChange event-->
                                 <form method="POST" enctype="multipart/form-data" style="margin-bottom: 10px;">
                                     {% csrf_token %}
                                     <input 
@@ -47,7 +53,23 @@
                                     <input type="hidden" name="character_id" value="{{ character.id }}">
                                     <button type="submit" name="upload_image" class="btn">Upload Image</button>
                                 </form>
-                                
+
+                                <br>
+                                <!-- Redirects to a finer detail of the character's informatoin-->
+                                <form method="POST" action="{% url 'character_detail' character.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">View Details</button>
+                                </form>
+
+                                <br>
+                                <!-- Character Delete Form -->
+                                <form method="POST" style="margin-top: 10px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                                    <button type="submit" name="delete_character" class="btn btn-danger">Delete Character</button>
+                                </form>
+
+                                <br>
                                 <!-- Image Delete Form -->
                                 {% if character.image %}
                                 <form method="POST">
@@ -99,6 +121,7 @@
                     {% for campaign in campaigns %}
                         <div class="card campaign-card">
                             <h3>{{ campaign.name }}</h3>
+                            <p><strong>Token:</strong> {{ campaign.access_token }}</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -115,6 +138,11 @@
                     {% csrf_token %}
                     {{ character_form.as_p }}
                     <button type="submit" name="create_character" class="btn">Create Character</button>
+                </form>
+                <br>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="randomize_character" class="btn">Create Random Character</button>
                 </form>
             </div>
             <div class="form-container">

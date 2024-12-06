@@ -1,12 +1,62 @@
 from django import forms
 from .models import Character, Campaign
 
+from django import forms
+from .models import Character
+
 class CharacterForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'race', 'background', 'charClass', 'gender', 'strength', 'dexterity', 'constitution', 
-                  'intelligence', 'wisdom', 'charisma', 'hitPoints', 'maxHitPoints', 'armorClass', 'speed', 
-                  'proficiencyBonus', 'level', 'experiencePoints']
+        fields = [
+            'name', 'race', 'background', 'charClass', 'gender',
+            'strength', 'dexterity', 'constitution', 'intelligence',
+            'wisdom', 'charisma', 'hitPoints', 'maxHitPoints',
+            'armorClass', 'speed', 'proficiencyBonus', 'level',
+            'experiencePoints', 'athletics', 'acrobatics', 'sleightOfHand',
+            'stealth', 'arcana', 'history', 'investigation', 'nature',
+            'religion', 'animalHandling', 'insight', 'medicine',
+            'perception', 'survival', 'deception', 'intimidation',
+            'performance', 'persuasion'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Character Name'}),
+            'race': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Character Race'}),
+            'background': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Character Background'}),
+            'charClass': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Character Class'}),
+            'gender': forms.Select(attrs={'class': 'form-select'}),
+            'strength': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'dexterity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'constitution': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'intelligence': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'wisdom': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'charisma': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'hitPoints': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'maxHitPoints': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'armorClass': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30}),
+            'speed': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'proficiencyBonus': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 6}),
+            'level': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 20}),
+            'experiencePoints': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'athletics': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'acrobatics': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'sleightOfHand': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'stealth': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'arcana': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'history': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'investigation': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'nature': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'religion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'animalHandling': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'insight': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'medicine': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'perception': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'survival': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'deception': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'intimidation': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'performance': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'persuasion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
 
 class CampaignForm(forms.ModelForm):
     class Meta:
@@ -23,9 +73,15 @@ class AccessTokenForm(forms.Form):
 class UpdateCharacterForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'race', 'background', 'charClass', 'gender', 'strength', 'dexterity', 'constitution', 
-                  'intelligence', 'wisdom', 'charisma', 'hitPoints', 'maxHitPoints', 'armorClass', 'speed', 
-                  'proficiencyBonus', 'level', 'experiencePoints']
+        fields = [
+            'name', 'race', 'background', 'charClass', 'strength', 'dexterity', 
+            'constitution', 'intelligence', 'wisdom', 'charisma', 'hitPoints',
+            'maxHitPoints', 'armorClass', 'speed', 'proficiencyBonus', 'level',
+            'athletics', 'acrobatics', 'sleightOfHand', 'stealth', 'arcana', 
+            'history', 'investigation', 'nature', 'religion', 'animalHandling', 
+            'insight', 'medicine', 'perception', 'survival', 'deception', 
+            'intimidation', 'performance', 'persuasion'
+        ]
 
 class CharacterImageUploadForm(forms.ModelForm):
     class Meta:

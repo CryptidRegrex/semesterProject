@@ -34,7 +34,7 @@ class Profile(models.Model):
 class Campaign(models.Model):
     userOwner = models.ForeignKey(Profile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, help_text="Name of the campaign")
-    characters = models.ManyToManyField('Character', related_name='campaigns', blank=True, help_text="Characters participating in this campaign")
+    characters = models.ManyToManyField('Character', related_name='character_campaigns', blank=True, help_text="Characters participating in this campaign")
     profiles = models.ManyToManyField(Profile, related_name="campaign_profiles", blank=True)  
     #Access token for a campaign owner to pass to a player in their campaign
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Auto-generated access token
@@ -91,6 +91,9 @@ class Character(models.Model):
 
     # Many-to-many relationship to Profile (for the owners of this character)
     profiles = models.ManyToManyField('Profile', related_name='owners', blank=True)
+
+    #Campagin
+    campaigns = models.ManyToManyField('Campaign', related_name='campaign_characters', blank=True)
     
     #image for the player to upload something to the site - Help from ChatGPT to create this. 
     image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
@@ -153,7 +156,7 @@ class Character(models.Model):
         """Calculate the ability modifier for a given ability score."""
         return (score - 10) // 2
 
-    #So fo rthis one there's a lot going on
+    #So for this one there's a lot going on
     def skillModifier(self, skill_name):
         """
         Calculate skill modifier based on proficiency and associated ability score.
