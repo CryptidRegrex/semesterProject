@@ -33,6 +33,7 @@ router.register(r'characters', CharacterViewSet, basename='character')
 router.register(r'register', UserRegistrationViewSet, basename='user-registration')
 # router.register(r'users', UserViewSet, basename='user')
 
+#static was used for media creation this sets the media's default location from the settings.py
 urlpatterns = [
     path('', index, name='index'),
     path('admin/', admin.site.urls),
@@ -45,5 +46,5 @@ urlpatterns = [
     #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     #path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
     #path('login/', TemplateView.as_view(template_name="login.html"), name="login"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

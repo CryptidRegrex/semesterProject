@@ -1,73 +1,131 @@
-<!-- Display Character and Campaigns -->
-<h2>Your Created Characters</h2>
-{% if created_characters_message %}
-    <p>{{ created_characters_message }}</p>
-{% else %}
-    <ul>
-    {% for character in created_characters %}
-        <li>
-            {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
-            <form method="GET" action="{% url 'update_character' character.id %}">
-                <button type="submit">Update</button>
-            </form>
-        </li>
-    {% endfor %}
-    </ul>
-{% endif %}
+<!-- ChatGPT helped with styling this page -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+            <h1>Welcome, {{ profile.user.username }}</h1>
+            <p class="subtitle">Manage your characters and campaigns from here.</p>
+        </header>
 
-<h2>Characters Associated with Your Campaigns</h2>
-{% if associated_characters_message %}
-    <p>{{ associated_characters_message }}</p>
-{% else %}
-    <ul>
-    {% for character in associated_characters %}
-        <li>
-            {{ character.name }} - Level {{ character.level }} {{ character.charClass }}
-            <form method="GET" action="{% url 'update_character' character.id %}">
-                <button type="submit">Update</button>
-            </form>
-        </li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-<h2>Your Campaigns</h2>
-{% if campaigns != "No Campaigns" %}
-    <ul>
-    {% for campaign in campaigns %}
-        <li>
-            {{ campaign.name }}
-            {% if campaign.userOwner == profile %}
-                (Access Token: {{ campaign.access_token }})
+        <!-- Characters Section -->
+        <section>
+            <h2>Your Created Characters</h2>
+            {% if created_characters %}
+                <div class="grid">
+                    {% for character, form in character_image_forms %}
+                        <div class="card">
+                            {% if character.image %}
+                                <img src="{{ character.image.url }}" alt="{{ character.name }}" class="character-image">
+                            {% else %}
+                                <div class="placeholder">No Image</div>
+                            {% endif %}
+                            <div class="card-content">
+                                <h3>{{ character.name }}</h3>
+                                <p>Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</p>
+                                
+                                <!-- Image Upload Form -->
+                                <form method="POST" enctype="multipart/form-data" style="margin-bottom: 10px;">
+                                    {% csrf_token %}
+                                    <input 
+                                        type="file" 
+                                        name="image" 
+                                        id="file-input-{{ character.id }}" 
+                                        style="display: none;" 
+                                        onchange="document.getElementById('file-name-{{ character.id }}').innerText = this.files[0]?.name || 'No file selected';"
+                                    >
+                                    <label for="file-input-{{ character.id }}" class="btn">Select Image</label>
+                                    <span id="file-name-{{ character.id }}" class="file-name">No file selected</span>
+                                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                                    <button type="submit" name="upload_image" class="btn">Upload Image</button>
+                                </form>
+                                
+                                <!-- Image Delete Form -->
+                                {% if character.image %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                                    <button type="submit" name="delete_image" class="btn btn-danger">Delete Image</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No Characters Created Yet</p>
             {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No Campaigns</p>
-{% endif %}
+        </section>
 
+        
 
-<!-- Form to create new Character -->
-<h2>Create New Character</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ character_form.as_p }}
-    <button type="submit" name="create_character">Create Character</button>
-</form>
+        <!-- Associated Characters Section -->
+        <section>
+            <h2>Characters Associated with Your Campaigns</h2>
+            {% if associated_characters %}
+                <div class="grid">
+                    {% for character in associated_characters %}
+                        <div class="card">
+                            {% if character.image %}
+                                <img src="{{ character.image.url }}" alt="{{ character.name }}" class="character-image">
+                            {% else %}
+                                <div class="placeholder">No Image</div>
+                            {% endif %}
+                            <div class="card-content">
+                                <h3>{{ character.name }}</h3>
+                                <p>Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No Associated Characters</p>
+            {% endif %}
+        </section>
 
-<!-- Form to create new Campaign -->
-<h2>Create New Campaign</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ campaign_form.as_p }}
-    <button type="submit" name="create_campaign">Create Campaign</button>
-</form>
+        <!-- Campaigns Section -->
+        <section>
+            <h2>Your Campaigns</h2>
+            {% if campaigns %}
+                <div class="grid">
+                    {% for campaign in campaigns %}
+                        <div class="card campaign-card">
+                            <h3>{{ campaign.name }}</h3>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No Campaigns Created Yet</p>
+            {% endif %}
+        </section>
 
-<!-- Form to create relationship between a character and campaign -->
-<h2>Join a Campaign</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ token_form.as_p }}
-    <button type="submit" name="submit_token">Join Campaign</button>
-</form>
+        <!-- Forms for Adding Characters and Campaigns -->
+        <section class="form-section">
+            <div class="form-container">
+                <h3>Create New Character</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ character_form.as_p }}
+                    <button type="submit" name="create_character" class="btn">Create Character</button>
+                </form>
+            </div>
+            <div class="form-container">
+                <h3>Create New Campaign</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ campaign_form.as_p }}
+                    <button type="submit" name="create_campaign" class="btn">Create Campaign</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

@@ -26,3 +26,8 @@ class UpdateCharacterForm(forms.ModelForm):
         fields = ['name', 'race', 'background', 'charClass', 'gender', 'strength', 'dexterity', 'constitution', 
                   'intelligence', 'wisdom', 'charisma', 'hitPoints', 'maxHitPoints', 'armorClass', 'speed', 
                   'proficiencyBonus', 'level', 'experiencePoints']
+
+class CharacterImageUploadForm(forms.ModelForm):
+    class Meta:
+        model = Character
+        fields = ['image']

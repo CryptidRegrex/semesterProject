@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 #Using this for special access token to campaign
 import uuid
+import os
+from django.utils.timezone import now
+from PIL import Image
 
 
 class Profile(models.Model):
@@ -36,6 +39,8 @@ class Campaign(models.Model):
     #Access token for a campaign owner to pass to a player in their campaign
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Auto-generated access token
 
+
+
     def __str__(self):
         return self.name
 
@@ -48,9 +53,48 @@ class Character(models.Model):
         ('O', 'Other'),
     ]
 
+    #ChatGPT helped in the creation of this definition
+    def user_directory_path(instance, filename):
+        """
+        Create a unique path for each user's uploaded files.
+        Example: media/characters/user_<id>/<unique_filename>
+        """
+        # Extract file extension
+        ext = filename.split('.')[-1]
+
+        # Generate unique filename
+        unique_filename = f"{uuid.uuid4().hex}.{ext}"
+
+        # Construct file path
+        return os.path.join(f"characters/user_{instance.profiles.first().user.id}", unique_filename)
+
+    #ChatGPT helped me create this definition. Way out of my league here.
+    # def save(self, *args, **kwargs):
+    #     # Call the parent save method to save the file
+    #     super().save(*args, **kwargs)
+
+    #     # Resize the image
+    #     if self.image:
+    #         img_path = self.image.path  # Full path to the uploaded image
+    #         img = Image.open(img_path)
+
+    #         # Check image mode and convert if necessary
+    #         if img.mode in ("RGBA", "P"):
+    #             img = img.convert("RGB")
+
+    #         # Resize the image (e.g., to 300x300 pixels)
+    #         max_size = (300, 300)
+    #         img.thumbnail(max_size, Image.Resampling.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
+
+    #         # Save the resized image back to the same path
+    #         img.save(img_path)
+
     # Many-to-many relationship to Profile (for the owners of this character)
     profiles = models.ManyToManyField('Profile', related_name='owners', blank=True)
     
+    #image for the player to upload something to the site - Help from ChatGPT to create this. 
+    image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
+
     # Basic Info
     name = models.CharField(max_length=100)
     race = models.CharField(max_length=50, help_text="Character's race, e.g., Elf, Human, Dwarf")

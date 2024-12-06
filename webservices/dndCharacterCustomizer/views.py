@@ -8,7 +8,7 @@ from .models import Profile, Character, Campaign
 #used within login_view definition
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import Http404
-from .forms import CharacterForm, CampaignForm, AccessTokenForm
+from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm
 
 # Index view for the home page when I render the initial page
 def index(request):
@@ -45,6 +45,12 @@ from django.contrib import messages
 from .forms import CharacterForm, CampaignForm, AccessTokenForm, UpdateCharacterForm
 from .models import Profile, Campaign, Character
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Profile, Character, Campaign
+from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm
+
 @login_required
 def user_dashboard(request):
     profile = Profile.objects.get(user=request.user)
@@ -55,17 +61,23 @@ def user_dashboard(request):
     # Characters created by the user
     created_characters = profile.owners.all()
 
-    # Characters associated with campaigns owned by the user but not created by the user
+    # Characters associated with campaigns owned by the user
     associated_characters = Character.objects.filter(
-        campaigns__userOwner=profile  # Characters in campaigns owned by the user
-    ).exclude(profiles=profile)  # Exclude characters owned by the user
+        campaigns__userOwner=profile
+    ).exclude(profiles=profile).distinct()
 
     # Messages for empty data
     campaigns_message = "No Campaigns" if not owned_campaigns else None
     created_characters_message = "No Created Characters" if not created_characters else None
     associated_characters_message = "No Associated Characters" if not associated_characters else None
 
-    # Initialize forms
+    # Prepare image upload forms for each created character
+    character_image_forms = [
+        (character, CharacterImageUploadForm(instance=character))
+        for character in created_characters
+    ]
+
+    # Initialize other forms
     character_form = CharacterForm()
     campaign_form = CampaignForm()
     token_form = AccessTokenForm()
@@ -91,7 +103,7 @@ def user_dashboard(request):
         
         elif 'submit_token' in request.POST:  # Handle access token submission
             token_form = AccessTokenForm(request.POST)
-            token_form.fields['character'].queryset = created_characters  # Limit character choices to user's characters
+            token_form.fields['character'].queryset = created_characters
             if token_form.is_valid():
                 access_token = token_form.cleaned_data['access_token']
                 character = token_form.cleaned_data['character']
@@ -101,15 +113,35 @@ def user_dashboard(request):
                 if character not in campaign.characters.all():
                     campaign.characters.add(character)
                     campaign.save()
-
-                    # # Grant the campaign owner access to the character
-                    # campaign.userOwner.owners.add(character)
-
                     messages.success(request, f"{character.name} has been added to the campaign: {campaign.name}.")
                 else:
                     messages.info(request, f"The character is already part of the campaign: {campaign.name}.")
                 return redirect('user_dashboard')
 
+        #ChatGPT helped with this feature
+        elif 'upload_image' in request.POST:  # Handle image upload
+            character_id = request.POST.get('character_id')
+            character = get_object_or_404(Character, id=character_id, profiles=profile)
+            form = CharacterImageUploadForm(request.POST, request.FILES, instance=character)
+            if form.is_valid():
+                form.save()  # Save the uploaded image
+                messages.success(request, f"Image uploaded for character '{character.name}'.")
+            else:
+                messages.error(request, f"Failed to upload image: {form.errors}")
+            return redirect('user_dashboard')
+
+        elif 'delete_image' in request.POST:  # Handle image deletion
+            character_id = request.POST.get('character_id')
+            character = get_object_or_404(Character, id=character_id, profiles=profile)
+            if character.image:
+                character.image.delete()  # Delete the image file
+                character.image = None
+                character.save()
+                messages.success(request, f"Image deleted for character '{character.name}'.")
+            else:
+                messages.info(request, f"No image to delete for character '{character.name}'.")
+            return redirect('user_dashboard')
+            
     return render(request, 'dashboard.html', {
         'profile': profile,
         'campaigns': owned_campaigns,
@@ -121,7 +153,10 @@ def user_dashboard(request):
         'character_form': character_form,
         'campaign_form': campaign_form,
         'token_form': token_form,
+        'character_image_forms': character_image_forms,  
     })
+
+
 
 
 @login_required
@@ -129,11 +164,12 @@ def update_character(request, character_id):
     # Fetch the character
     character = get_object_or_404(Character, id=character_id)
 
-    # Check if the user has permission to update the character
+    # Check if the logged-in user owns a campaign associated with this character
     profile = Profile.objects.get(user=request.user)
-    if not character.profiles.filter(id=profile.id).exists():
+    if not Campaign.objects.filter(userOwner=profile, characters=character).exists():
         return HttpResponseForbidden("You do not have permission to update this character.")
 
+    # Process the form
     if request.method == "POST":
         form = UpdateCharacterForm(request.POST, instance=character)
         if form.is_valid():
