@@ -1,0 +1,136 @@
+/* Some help from ChatGPT on some portion of this stylesheet */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #666;
+}
+
+/* Section Styling */
+section {
+    margin-bottom: 40px;
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Card Styling */
+.card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+}
+
+.card img.character-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+}
+
+.placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Card Content */
+.card-content {
+    padding: 15px;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+/* General button styling */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
+    background-color: #007bff; /* Default blue */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Danger button styling (delete button) */
+.btn-danger {
+    background-color: #dc3545; /* Red color */
+}
+
+.btn-danger:hover {
+    background-color: #a71d2a; /* Darker red for hover */
+}
+
+.file-name {
+    margin-left: 10px;
+    font-style: italic;
+    color: #666;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/* Form Section */
+.form-section {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-container {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
