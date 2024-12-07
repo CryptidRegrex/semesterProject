@@ -64,6 +64,17 @@ INSTALLED_APPS = [
     
 # }
 
+#Implementation of an email config so it can send emails out to our users
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"  # Use Gmail's SMTP server
+EMAIL_PORT = 587  # Common SMTP port for TLS
+EMAIL_USE_TLS = True  # Use TLS encryption
+EMAIL_HOST_USER = "dndcharactercustomizer@gmail.com" 
+EMAIL_HOST_PASSWORD = "lyur liwk phst scub"  
+DEFAULT_FROM_EMAIL = "dndcharactercustomizer@gmail.com"
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

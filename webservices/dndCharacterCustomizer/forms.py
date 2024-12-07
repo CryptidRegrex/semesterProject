@@ -1,8 +1,6 @@
 from django import forms
 from .models import Character, Campaign
-
-from django import forms
-from .models import Character
+from django.contrib.auth.models import User
 
 class CharacterForm(forms.ModelForm):
     class Meta:
@@ -87,3 +85,21 @@ class CharacterImageUploadForm(forms.ModelForm):
     class Meta:
         model = Character
         fields = ['image']
+
+
+class UpdateUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
+
+    #ChatGPT helped me figure out how the heck this works. I failed to understand django's doc.
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email

@@ -27,6 +27,9 @@ class Profile(models.Model):
     characters = models.ManyToManyField("Character", blank=True)
     campaigns = models.ManyToManyField("Campaign", related_name="profile_campaigns", blank=True)
 
+    #Used for password resets
+    reset_token = models.CharField(max_length=64, blank=True, null=True)
+
     def __str__(self):
         return f"{self.user.username} - {self.type}"
 
@@ -67,27 +70,6 @@ class Character(models.Model):
 
         # Construct file path
         return os.path.join(f"characters/user_{instance.profiles.first().user.id}", unique_filename)
-
-    #ChatGPT helped me create this definition. Way out of my league here.
-    # def save(self, *args, **kwargs):
-    #     # Call the parent save method to save the file
-    #     super().save(*args, **kwargs)
-
-    #     # Resize the image
-    #     if self.image:
-    #         img_path = self.image.path  # Full path to the uploaded image
-    #         img = Image.open(img_path)
-
-    #         # Check image mode and convert if necessary
-    #         if img.mode in ("RGBA", "P"):
-    #             img = img.convert("RGB")
-
-    #         # Resize the image (e.g., to 300x300 pixels)
-    #         max_size = (300, 300)
-    #         img.thumbnail(max_size, Image.Resampling.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
-
-    #         # Save the resized image back to the same path
-    #         img.save(img_path)
 
     # Many-to-many relationship to Profile (for the owners of this character)
     profiles = models.ManyToManyField('Profile', related_name='owners', blank=True)

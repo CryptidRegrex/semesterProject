@@ -26,24 +26,27 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
-from dndCharacterCustomizer.views import index, login_view, user_dashboard, logout_view, register_view, update_character
+from dndCharacterCustomizer.views import index, login_view, user_dashboard, logout_view, register_view, update_character, update_account, reset_password_request, reset_password_confirm
 
-router = DefaultRouter()
-router.register(r'characters', CharacterViewSet, basename='character')
-router.register(r'register', UserRegistrationViewSet, basename='user-registration')
+# router = DefaultRouter()
+# router.register(r'characters', CharacterViewSet, basename='character')
+# router.register(r'register', UserRegistrationViewSet, basename='user-registration')
 # router.register(r'users', UserViewSet, basename='user')
 
 #static was used for media creation this sets the media's default location from the settings.py
 urlpatterns = [
     path('', index, name='index'),
     path('admin/', admin.site.urls),
-    path('api', include(router.urls)),
+    #path('api', include(router.urls)),
     path('login/', login_view, name='login'),
     path('dashboard/', user_dashboard, name='user_dashboard'),
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
     path('character/<int:character_id>/update/', update_character, name='update_character'),
     path('character/<int:character_id>/', views.character_detail, name='character_detail'),
+    path("account/update/", update_account, name="update_account"),
+    path("reset-password/", reset_password_request, name="reset_password"),
+    path("reset-password/<str:token>/", reset_password_confirm, name="reset_password_confirm"),
     #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     #path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
     #path('login/', TemplateView.as_view(template_name="login.html"), name="login"),
