@@ -37,7 +37,15 @@
         {% if campaigns %}
             <ul>
                 {% for campaign in campaigns %}
-                    <li>{{ campaign.name }}</li>
+                    <li style="margin-bottom: 20px;">
+                        <p>{{ campaign.name }}</p>
+                        <form method="POST" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="leave_campaign" value="true">
+                            <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                            <button type="submit" class="btn btn-danger">Leave Campaign</button>
+                        </form>
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}

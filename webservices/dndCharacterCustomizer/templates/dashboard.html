@@ -8,7 +8,6 @@
     <title>User Dashboard</title>
     <!-- General styles for consistant look across certain aspects like navbar-->
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
     
@@ -92,7 +91,6 @@
         </section>
 
         
-
         <!-- Associated Characters Section -->
         <section>
             <h2>Characters Associated with Your Campaigns</h2>
@@ -108,6 +106,7 @@
                             <div class="card-content">
                                 <h3>{{ character.name }}</h3>
                                 <p>Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</p>
+                                <a href="{% url 'update_character' character.id %}" class="btn btn-primary">Manage Character</a>
                             </div>
                         </div>
                     {% endfor %}
@@ -126,6 +125,12 @@
                         <div class="card campaign-card">
                             <h3>{{ campaign.name }}</h3>
                             <p><strong>Token:</strong> {{ campaign.access_token }}</p>
+                            <!-- Campaign Delete Form -->
+                            <form method="POST" style="margin-top: 10px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                                <button type="submit" name="delete_campaign" class="btn btn-danger">Delete Campaign</button>
+                            </form>
                         </div>
                     {% endfor %}
                 </div>

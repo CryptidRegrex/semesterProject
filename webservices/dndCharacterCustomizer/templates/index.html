@@ -1,75 +1,58 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <p>You visited this page {{ num_visits }} time{{ num_visits | pluralize}}</p>
     <title>Welcome to Character Customizer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .box {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 10px 0;
-        }
-        .box h2 {
-            margin-top: 0;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .login-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .login-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+
 </head>
+
+
+
 <body>
+
+    <!-- Login Button -->
     <a href="{% url 'login' %}" class="login-button">Login</a>
+
+    <!-- Main Content -->
     <div class="container">
         <h1>Welcome to Character Customizer</h1>
-        <p>This site's purpose is for you to create 5e characters and campaigns related to those characters.</p>
+        <p>Create, randomize, and manage your Dungeons & Dragons 5e characters and campaigns.</p>
         <div class="grid">
             <div class="box">
-                <h2>Feature 1</h2>
-                <p>Character Creation.</p>
+                <h2>Feature 1: Character Creation</h2>
+                <p>
+                    Manage your Dungeons & Dragons 5e characters! Choose their race, class, 
+                    abilities, and backstory to craft heroes or villains for your campaigns. Whether you're a seasoned player or a beginner, 
+                    this tool offers a guided, user-friendly experience to bring your imagination to life.
+                </p>
             </div>
             <div class="box">
-                <h2>Feature 2</h2>
-                <p>Character Randomization.</p>
+                <h2>Feature 2: Character Randomization</h2>
+                <p>
+                    Try our character randomization feature! Generate entirely new characters with the click of a button. 
+                    This feature ensures the characters are within the rules of 5e, making it perfect for quick games or discovering new 
+                    combinations you might not have considered.
+                </p>
             </div>
             <div class="box">
-                <h2>Feature 3</h2>
-                <p>Campaign-Character Management.</p>
+                <h2>Feature 3: Campaign-Character Management</h2>
+                <p>
+                    Seamlessly integrate your characters into campaigns. With our management tools, you can assign characters to specific campaigns 
+                    for easy Dungeon Master and player tracking. Easily update a character's current status via the update management feature.
+                </p>
             </div>
         </div>
+        <a href="{% url 'register' %}" class="register-button">Register Now!</a>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p> Character Customizer. MIT License </p>
+    </footer>
 </body>
 </html>

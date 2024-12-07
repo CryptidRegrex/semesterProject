@@ -14,16 +14,13 @@ from django.http import Http404
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm, UpdateUserForm
 import random
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+from django.http import HttpResponseForbidden
 
 # Index view for the home page when I render the initial page
 def index(request):
-    num_visits = request.session.get('num_visits', 0)
-    num_visits += 1
-    request.session['num_visits'] = num_visits
-    context = {
-        'num_visits': num_visits
-    }
-    return render(request, 'index.html', context=context)
+    return render(request, 'index.html')
 
 # This will render the login.html page so users can attempt to authenticate to the application
 def login_view(request):
@@ -40,6 +37,54 @@ def login_view(request):
             return render(request, "login.html", {"error": "Invalid username or password."})
     
     return render(request, "login.html")
+
+def reset_password_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = User.objects.get(email=email)
+            reset_token = get_random_string(32)  # Generate a secure random token
+            user.profile.reset_token = reset_token  # Assume `reset_token` exists in the Profile model
+            user.profile.save()
+
+            reset_link = request.build_absolute_uri(f"/reset-password/{reset_token}/")
+            send_mail(
+                "Password Reset Request",
+                f"Click the following link to reset your password: {reset_link}",
+                "no-reply@example.com",
+                [email],
+            )
+            messages.success(request, "Password reset email sent. Please check your inbox.")
+        except User.DoesNotExist:
+            messages.error(request, "No user found with that email address.")
+        return redirect("login")
+    
+    return render(request, "reset_password_request.html")
+
+def reset_password_confirm(request, token):
+    # Fetch the Profile using the reset_token
+    profile = get_object_or_404(Profile, reset_token=token)
+    user = profile.user
+
+    if request.method == "POST":
+        new_password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if new_password and confirm_password:  # Ensure both fields are provided
+            if new_password == confirm_password:
+                user.set_password(new_password)
+                user.save()
+                profile.reset_token = None  # Clear the reset token
+                profile.save()
+                messages.success(request, "Your password has been reset successfully!")
+                return redirect("login")  # Redirect to login after success
+            else:
+                messages.error(request, "Passwords do not match. Please try again.")
+        else:
+            messages.error(request, "Both password fields are required.")
+
+    return render(request, "reset_password.html", {"token": token})
+
 
 @login_required
 def character_detail(request, character_id):
@@ -88,6 +133,15 @@ def character_detail(request, character_id):
                     messages.info(request, f"Character '{character.name}' is already part of the campaign '{campaign.name}'.")
             else:
                 messages.error(request, "Invalid campaign token. Please try again.")
+        elif "leave_campaign" in request.POST:
+            # Handle leaving a campaign
+            campaign_id = request.POST.get("campaign_id")
+            campaign = Campaign.objects.filter(id=campaign_id).first()
+            if campaign and campaign in character.campaigns.all():
+                character.campaigns.remove(campaign)
+                messages.success(request, f"Character '{character.name}' has left the campaign '{campaign.name}'.")
+            else:
+                messages.error(request, "Could not leave the campaign. Please try again.")
         return redirect("character_detail", character_id=character.id)
 
     # Fetch campaigns the character is part of
@@ -99,8 +153,6 @@ def character_detail(request, character_id):
         "update_character_form": update_character_form,
         "campaigns": campaigns,
     })
-
-
 
 
 @login_required
@@ -189,11 +241,33 @@ def user_dashboard(request):
                 messages.error(request, f"Failed to upload image: {form.errors}")
             return redirect('user_dashboard')
         
+        elif "delete_image" in request.POST:
+            # Get the character ID from the POST request
+            character_id = request.POST.get('character_id')
+            # Fetch the character object
+            character = get_object_or_404(Character, id=character_id, profiles=profile)
+            # Handle image deletion
+            if character.image:
+                character.image.delete()  # Deletes the file from storage
+                character.image = None
+                character.save()
+                messages.success(request, f"Image deleted for character '{character.name}' successfully!")
+            else:
+                messages.error(request, "No image to delete.")
+            return redirect('user_dashboard')
+
         elif 'delete_character' in request.POST:  # Handle character deletion
             character_id = request.POST.get('character_id')
             character = get_object_or_404(Character, id=character_id, profiles=profile)
             character.delete()
             messages.success(request, f"Character '{character.name}' has been deleted.")
+            return redirect('user_dashboard')
+
+        elif 'delete_campaign' in request.POST:  # Handle character deletion
+            campaign_id = request.POST.get('campaign_id')
+            campaign = get_object_or_404(Campaign, id=campaign_id, profiles=profile)
+            campaign.delete()
+            messages.success(request, f"Campaign '{campaign.name}' has been deleted.")
             return redirect('user_dashboard')
 
     return render(request, 'dashboard.html', {
@@ -207,13 +281,17 @@ def user_dashboard(request):
         'character_form': character_form,
         'campaign_form': campaign_form,
         'token_form': token_form,
-        'character_image_forms': character_image_forms,  # Pass image forms to template
+        'character_image_forms': character_image_forms,  
     })
 
 
 @login_required
 def update_account(request):
     user = request.user
+
+    # Initialize forms
+    user_form = UpdateUserForm(instance=user)
+    password_form = PasswordChangeForm(user)
 
     if request.method == "POST":
         if "update_details" in request.POST:
@@ -235,14 +313,20 @@ def update_account(request):
             else:
                 messages.error(request, "Please correct the errors below.")
 
-    else:
-        user_form = UpdateUserForm(instance=user)
-        password_form = PasswordChangeForm(user)
+        elif "delete_account" in request.POST:
+            if request.POST.get("confirm_delete") == "true":
+                user.delete()
+                logout(request)
+                messages.success(request, "Your account has been deleted successfully.")
+                return redirect("index")
+            else:
+                messages.warning(request, "Please confirm your account deletion.")
 
     return render(request, "update_account.html", {
         "user_form": user_form,
         "password_form": password_form,
     })
+
 
 @login_required
 def update_character(request, character_id):
@@ -251,7 +335,7 @@ def update_character(request, character_id):
 
     # Check if the logged-in user owns a campaign associated with this character
     profile = Profile.objects.get(user=request.user)
-    if not Campaign.objects.filter(userOwner=profile, characters=character).exists():
+    if not character.campaigns.filter(userOwner=profile).exists():
         return HttpResponseForbidden("You do not have permission to update this character.")
 
     # Process the form
@@ -260,13 +344,17 @@ def update_character(request, character_id):
         if form.is_valid():
             form.save()
             messages.success(request, f"Character '{character.name}' updated successfully.")
-            return redirect('user_dashboard')
+            return redirect("user_dashboard")
     else:
         form = UpdateCharacterForm(instance=character)
+
+    # Fetch the campaign associated with the character (if any)
+    associated_campaign = character.campaigns.filter(userOwner=profile).first()
 
     return render(request, 'update_character.html', {
         'form': form,
         'character': character,
+        'campaign': associated_campaign,
     })
 
 
@@ -328,6 +416,8 @@ def randomize_character():
     classes = ["Fighter", "Wizard", "Rogue", "Cleric", "Paladin", "Ranger", "Bard"]
     ability_scores = sorted([random.randint(3, 18) for _ in range(6)], reverse=True)  # Randomly roll six scores
     
+    hit_points = random.randint(10,20)
+
     return {
         "name": f"Random Character {random.randint(1, 1000)}",
         "race": random.choice(races),
@@ -339,8 +429,8 @@ def randomize_character():
         "intelligence": ability_scores[3],
         "wisdom": ability_scores[4],
         "charisma": ability_scores[5],
-        "hitPoints": random.randint(5, 15),  # Example starting range
-        "maxHitPoints": random.randint(10, 20),
+        "hitPoints": hit_points,  
+        "maxHitPoints": hit_points,
         "armorClass": random.randint(10, 18),
         "speed": 30,  # Standard speed for most characters
         "proficiencyBonus": 2,  # Default for level 1

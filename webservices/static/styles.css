@@ -38,8 +38,6 @@ section {
     margin-bottom: 40px;
 }
 
-
-
 /* Grid Layout */
 .grid {
     display: grid;
@@ -86,7 +84,6 @@ section {
     margin-bottom: 10px;
 }
 
-/* Buttons */
 /* General button styling */
 .btn {
     display: inline-block;
