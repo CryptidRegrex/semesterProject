@@ -26,7 +26,7 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
-from dndCharacterCustomizer.views import index, login_view, user_dashboard, logout_view, register_view, update_character
+from dndCharacterCustomizer.views import index, login_view, user_dashboard, logout_view, register_view, update_character, update_account
 
 router = DefaultRouter()
 router.register(r'characters', CharacterViewSet, basename='character')

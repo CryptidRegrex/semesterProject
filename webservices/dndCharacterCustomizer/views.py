@@ -2,7 +2,7 @@
 #If a user tries to access this page without authentication it will redirect them
 #If the user IS logged in it will execute the definition
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -11,7 +11,8 @@ from .models import Profile, Character, Campaign
 #used within login_view definition
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import Http404
-from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm
+from django.contrib.auth.forms import PasswordChangeForm
+from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm, UpdateUserForm
 import random
 
 # Index view for the home page when I render the initial page
@@ -210,7 +211,38 @@ def user_dashboard(request):
     })
 
 
+@login_required
+def update_account(request):
+    user = request.user
 
+    if request.method == "POST":
+        if "update_details" in request.POST:
+            user_form = UpdateUserForm(request.POST, instance=user)
+            if user_form.is_valid():
+                user_form.save()
+                messages.success(request, "Your account details have been updated successfully.")
+                return redirect("update_account")
+            else:
+                messages.error(request, "Please correct the errors below.")
+
+        elif "change_password" in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Keep the user logged in after password change
+                messages.success(request, "Your password has been updated successfully.")
+                return redirect("update_account")
+            else:
+                messages.error(request, "Please correct the errors below.")
+
+    else:
+        user_form = UpdateUserForm(instance=user)
+        password_form = PasswordChangeForm(user)
+
+    return render(request, "update_account.html", {
+        "user_form": user_form,
+        "password_form": password_form,
+    })
 
 @login_required
 def update_character(request, character_id):

@@ -1,67 +1,14 @@
 /* Some help from ChatGPT on styling like navbar and containers */
-
-/* Global styles */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f9fa; /* Light gray background */
-    color: #333; /* Dark text */
-    box-sizing: border-box;
-}
-
-h1, h2 {
-    color: #343a40; /* Darker gray for headings */
-    margin-top: 0;
-    font-family: 'Verdana', sans-serif;
-}
-
 .container {
     max-width: 1400px;
     margin: 20px auto;
     padding: 20px;
     display: flex;
     gap: 30px;
-    background-color: #fff; /* White background */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #fff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
     border-radius: 10px;
     overflow: hidden;
-}
-
-/* Navigation Bar */
-.navigation-bar {
-    background-color: #f8f9fa;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 20px;
-}
-
-.navigation-bar .btn {
-    background-color: #007BFF;
-    color: #fff;
-    text-decoration: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    text-align: center;
-    display: inline-block;
-}
-
-.navigation-bar .btn:hover {
-    background-color: #0056b3;
-}
-
-.navigation-bar .btn-secondary {
-    background-color: #6c757d;
-}
-
-.navigation-bar .btn-secondary:hover {
-    background-color: #5a6268;
 }
 
 /* Left Column Styles */
@@ -83,13 +30,6 @@ h1, h2 {
 
 .left-column ul li strong {
     color: #495057; /* Medium gray for labels */
-}
-
-h2 {
-    margin-bottom: 15px;
-    border-bottom: 2px solid #007BFF; /* Blue underline */
-    display: inline-block;
-    padding-bottom: 5px;
 }
 
 /* Right Column Styles */
@@ -142,9 +82,9 @@ input[type="file"] {
     background-color: #f8f9fa;
 }
 
-input[type="file"]::-webkit-file-upload-button {
+/* input[type="file"]::-webkit-file-upload-button {
     visibility: hidden;
-}
+} */
 
 input[type="file"]:before {
     content: 'Choose File';
@@ -162,45 +102,6 @@ input[type="file"]:before {
 
 input[type="file"]:hover:before {
     background-color: #0056b3;
-}
-
-.btn {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-size: 14px;
-}
-
-.btn:hover {
-    background-color: #0056b3;
-}
-
-/* Danger button styling (delete button) */
-.btn-danger {
-    background-color: #dc3545; /* Red color */
-}
-
-.btn-danger:hover {
-    background-color: #a71d2a; /* Darker red for hover */
-}
-
-.logout-btn {
-    background-color: #d9534f; /* Red color */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.logout-btn:hover {
-    background-color: #c9302c; /* Darker red */
 }
 
 .character-detail {
@@ -227,28 +128,6 @@ input[type="file"]:hover:before {
     height: auto;
     border-radius: 8px;
     margin-bottom: 10px;
-}
-
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn:hover {
-    opacity: 0.9;
 }
 
 .campaigns-section {
@@ -324,9 +203,6 @@ input[type="file"]:hover:before {
     background-color: #0056b3;
 }
 
-
-
-/* Responsive Design */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;

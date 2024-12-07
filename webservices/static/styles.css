@@ -1,48 +1,92 @@
-.character-list {
-    list-style-type: none;
+/* Some help from ChatGPT on some portion of this stylesheet */
+
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
     padding: 0;
+    background-color: #f8f9fa; /* Light gray background */
+    color: #333; /* Dark text */
+    box-sizing: border-box;
 }
 
-.character-item {
-    margin-bottom: 20px;
-    padding: 15px;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007BFF; /* Blue underline */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #666;
+}
+
+/* Section Styling */
+section {
+    margin-bottom: 40px;
+}
+
+
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Card Styling */
+.card {
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
-    display: flex;
-    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
 }
 
-.character-item img {
-    width: 100px;
-    height: auto;
-    margin-right: 15px;
-    float: left;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.card img.character-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
 }
 
-.character-item .placeholder {
-    width: 100px;
-    height: 100px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 15px;
-    float: left;
+.placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1rem;
+    color: #666;
 }
 
-.character-item .details {
-    flex: 3;
+/* Card Content */
+.card-content {
+    padding: 15px;
 }
 
-.character-item .form-wrapper {
-    text-align: right;
-    margin-top: 10px;
+.card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
 }
 
+/* Buttons */
 /* General button styling */
 .btn {
     display: inline-block;
@@ -62,11 +106,105 @@
     background-color: #0056b3; /* Darker blue for hover */
 }
 
-/* Danger button styling */
+/* Danger button styling (delete button) */
 .btn-danger {
     background-color: #dc3545; /* Red color */
 }
 
 .btn-danger:hover {
     background-color: #a71d2a; /* Darker red for hover */
+}
+
+.file-name {
+    margin-left: 10px;
+    font-style: italic;
+    color: #666;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+/* Form Section */
+.form-section {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-container {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.nav-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: #0056b3;
+}
+
+.nav-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* General button styling */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
+    background-color: #007bff; /* Default blue */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.logout-btn {
+    background-color: #d9534f; /* Red color */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c; /* Darker red */
 }

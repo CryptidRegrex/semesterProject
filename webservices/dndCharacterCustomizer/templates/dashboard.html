@@ -6,12 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
+    <!-- General styles for consistant look across certain aspects like navbar-->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
     
-    <div class="navigation-buttons">
+    <div class="navbar">
+        <a href="{% url 'update_account' %}" class="btn">Update Account</a>
         <a href="{% url 'index' %}" class="btn btn-secondary">Home</a>
+        <a href="{% url 'logout' %}" class="btn logout-btn">Logout</a>
     </div>
     
     <div class="container">
