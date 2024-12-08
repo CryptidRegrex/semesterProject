@@ -205,3 +205,30 @@ input[type="file"]::-webkit-file-upload-button {
 .logout-btn:hover {
     background-color: #c9302c; /* Darker red */
 }
+
+.password-requirements {
+    background-color: #f8f9fa; /* Light gray background */
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 5px;
+}
+
+.password-requirements h4 {
+    margin-top: 0;
+    color: #343a40; /* Darker gray for headings */
+}
+
+.password-requirements ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.password-requirements ul li {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #495057; /* Medium gray for text */
+    position: relative;
+    padding-left: 20px;
+}

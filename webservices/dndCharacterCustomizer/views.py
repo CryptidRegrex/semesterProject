@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Profile, Character, Campaign
+from django.contrib.auth.password_validation import validate_password
 #This took forever to figure out. Essentially we are going to call django's native login() function and we are going to rename it to make it clear what it is
 #used within login_view definition
 from django.http import Http404
@@ -16,6 +17,7 @@ import random
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.http import HttpResponseForbidden
+from django.core.exceptions import ValidationError
 
 # Index view for the home page when I render the initial page
 def index(request):
@@ -50,7 +52,7 @@ def reset_password_request(request):
             send_mail(
                 "Password Reset Request",
                 f"Click the following link to reset your password: {reset_link}",
-                "no-reply@example.com",
+                "dndcharactercustomizer@gmail.com",
                 [email],
             )
             messages.success(request, "Password reset email sent. Please check your inbox.")
@@ -71,12 +73,18 @@ def reset_password_confirm(request, token):
 
         if new_password and confirm_password:  # Ensure both fields are provided
             if new_password == confirm_password:
-                user.set_password(new_password)
-                user.save()
-                profile.reset_token = None  # Clear the reset token
-                profile.save()
-                messages.success(request, "Your password has been reset successfully!")
-                return redirect("login")  # Redirect to login after success
+                try:
+                    # Validate the new password using Django's validators
+                    validate_password(new_password, user)
+                    user.set_password(new_password)
+                    user.save()
+                    profile.reset_token = None  # Clear the reset token
+                    profile.save()
+                    messages.success(request, "Your password has been reset successfully!")
+                    return redirect("login")  # Redirect to login after success
+                except ValidationError as e:
+                    # Pass validation error messages to the template
+                    messages.error(request, ", ".join(e.messages))
             else:
                 messages.error(request, "Passwords do not match. Please try again.")
         else:
@@ -369,29 +377,36 @@ def register_view(request):
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         
-        errors = []
-        
         # Validate passwords
         if password1 != password2:
-            errors.append("Passwords do not match.")
+            messages.error(request, "Passwords do not match.")
+            return render(request, "register.html")
+
+        # This validates that the password meets minimum requirements before it will be accepted.
+        try:
+            validate_password(password1)
+        # Want to let the user know what they need to do to meet minimum requirements.
+        except ValidationError as e:
+            for error in e:
+                messages.error(request, error)
+            return render(request, "register.html")
         
         # Check if username is taken
         if User.objects.filter(username=username).exists():
-            errors.append("Username is already taken.")
+            messages.error(request,"Username is already taken.")
+            return render(request, "register.html")
         
         # Check if email is taken
         if User.objects.filter(email=email).exists():
-            errors.append("Email is already registered.")
+            messages.error(request, "Email is already registered.")
+            return render(request, "register.html")
         
-        if errors:
-            return render(request, "register.html", {"errors": errors})
         
         # Create the user
         user = User.objects.create_user(username=username, email=email, password=password1)
         user.save()
-        
-        messages.success(request, "Your account has been created! You can now log in.")
-        return redirect("login")
+        auth_login(request, user)
+        return redirect("user_dashboard")
     
     return render(request, "register.html")
 
