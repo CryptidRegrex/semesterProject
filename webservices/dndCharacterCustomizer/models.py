@@ -71,6 +71,22 @@ class Character(models.Model):
         # Construct file path
         return os.path.join(f"characters/user_{instance.profiles.first().user.id}", unique_filename)
 
+    #We want to ensure that the image is no greater than 20MB and that it is only accepting common image types
+    #If we allow the user to input a terabyte file or something rediculous it could crash the server
+    #Oh additoinally this could cost us depending on the cloud service
+    def validate_image_size_and_type(image):
+        max_size = 20 * 1024 * 1024  # 20MB
+        valid_mime_types = ['image/jpeg', 'image/png']
+        valid_extensions = ['jpg', 'jpeg', 'png']
+
+        # Check file size
+        if image.size > max_size:
+            raise ValidationError(f"File size must be less than 20MB.")
+
+        # Check file type
+        if image.content_type not in valid_mime_types:
+            raise ValidationError(f"Unsupported file type. Only {', '.join(valid_extensions)} are allowed.")
+
     # Many-to-many relationship to Profile (for the owners of this character)
     profiles = models.ManyToManyField('Profile', related_name='owners', blank=True)
 
@@ -78,7 +94,8 @@ class Character(models.Model):
     campaigns = models.ManyToManyField('Campaign', related_name='campaign_characters', blank=True)
     
     #image for the player to upload something to the site - Help from ChatGPT to create this. 
-    image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
+    #calling a new defintion that will ensure image is of certain type and size
+    image = models.ImageField(upload_to=user_directory_path, blank=True, null=True, validators=[validate_image_size_and_type])
 
     # Basic Info
     name = models.CharField(max_length=100)

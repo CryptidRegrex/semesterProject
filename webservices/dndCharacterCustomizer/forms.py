@@ -86,6 +86,24 @@ class CharacterImageUploadForm(forms.ModelForm):
         model = Character
         fields = ['image']
 
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+
+        if image:
+            max_size = 20 * 1024 * 1024  # 20MB
+            valid_mime_types = ['image/jpeg', 'image/png']
+            valid_extensions = ['jpg', 'jpeg', 'png']
+
+            # Check file size
+            if image.size > max_size:
+                raise forms.ValidationError("File size must be less than 20MB.")
+
+            # Check file type
+            if image.content_type not in valid_mime_types:
+                raise forms.ValidationError(f"Unsupported file type. Only {', '.join(valid_extensions)} are allowed.")
+
+        return image
+
 
 class UpdateUserForm(forms.ModelForm):
     class Meta:

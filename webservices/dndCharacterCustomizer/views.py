@@ -110,7 +110,8 @@ def character_detail(request, character_id):
                 image_upload_form.save()
                 messages.success(request, "Image uploaded successfully!")
             else:
-                messages.error(request, "Failed to upload image. Please try again.")
+                for error in image_upload_form.errors.values():
+                    messages.error(request, error)
         elif "delete_image" in request.POST:
             # Handle image deletion
             if character.image:
@@ -245,7 +246,8 @@ def user_dashboard(request):
                 form.save()  # Save the form if valid
                 messages.success(request, f"Image uploaded for character '{character.name}'.")
             else:
-                messages.error(request, f"Failed to upload image: {form.errors}")
+                for error in form.errors.values():
+                    messages.error(request, error)
             return redirect('user_dashboard')
         
         elif "delete_image" in request.POST:

@@ -166,6 +166,14 @@
 
         <!-- Right Column: Character Image -->
         <div class="right-column">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p class="message {{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% if character.image %}
                 <img src="{{ character.image.url }}" alt="{{ character.name }}" class="character-image">
                 <form method="POST" style="margin-top: 10px;">

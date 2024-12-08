@@ -89,7 +89,14 @@
                 <p>No Characters Created Yet</p>
             {% endif %}
         </section>
-
+        
+        <div class="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
         
         <!-- Associated Characters Section -->
         <section>
