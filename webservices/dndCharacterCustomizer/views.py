@@ -2,14 +2,13 @@
 #If a user tries to access this page without authentication it will redirect them
 #If the user IS logged in it will execute the definition
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth import authenticate, logout, update_session_auth_hash, login as auth_login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Profile, Character, Campaign
 #This took forever to figure out. Essentially we are going to call django's native login() function and we are going to rename it to make it clear what it is
 #used within login_view definition
-from django.contrib.auth import authenticate, login as auth_login
 from django.http import Http404
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm, UpdateUserForm

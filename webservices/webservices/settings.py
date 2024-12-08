@@ -23,6 +23,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #Redirects the user to the homepage when logging out
 LOGOUT_REDIRECT_URL = 'index'
 
+#Needed to configure SSL settings for HTTPS.
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
     'dndCharacterCustomizer',
     'rest_framework',
     'rest_framework.authtoken',
+    # 'sslserver'
 ]
 
 #This is required for the auth token
@@ -71,7 +77,7 @@ EMAIL_HOST = "smtp.gmail.com"  # Use Gmail's SMTP server
 EMAIL_PORT = 587  # Common SMTP port for TLS
 EMAIL_USE_TLS = True  # Use TLS encryption
 EMAIL_HOST_USER = "dndcharactercustomizer@gmail.com" 
-EMAIL_HOST_PASSWORD = "lyur liwk phst scub"  
+EMAIL_HOST_PASSWORD = ""  
 DEFAULT_FROM_EMAIL = "dndcharactercustomizer@gmail.com"
 
 
