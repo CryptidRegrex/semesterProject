@@ -86,6 +86,9 @@ class CharacterImageUploadForm(forms.ModelForm):
         model = Character
         fields = ['image']
 
+    # We want to ensure that the image is no greater than 20MB and it only accepts jpg or png
+    # If we allow the user to input a terabyte file or something rediculous it could crash the server
+    # Oh additoinally this could cost us depending on the cloud service
     def clean_image(self):
         image = self.cleaned_data.get('image')
 

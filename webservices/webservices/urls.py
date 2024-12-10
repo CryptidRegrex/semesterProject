@@ -36,7 +36,7 @@ from dndCharacterCustomizer.views import index, login_view, user_dashboard, logo
 #static was used for media creation this sets the media's default location from the settings.py
 urlpatterns = [
     path('', index, name='index'),
-    path('admin/', admin.site.urls),
+    path('6151024e-d149-49f8-b40b-cbd19554ec40/', admin.site.urls),
     #path('api', include(router.urls)),
     path('login/', login_view, name='login'),
     path('dashboard/', user_dashboard, name='user_dashboard'),
@@ -48,7 +48,5 @@ urlpatterns = [
     path("reset-password/", reset_password_request, name="reset_password"),
     path("reset-password/<str:token>/", reset_password_confirm, name="reset_password_confirm"),
     #path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    #path('dndCharacterCustomizer/', include('dndCharacterCustomizer.urls')),
-    #path('login/', TemplateView.as_view(template_name="login.html"), name="login"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -8,11 +8,15 @@
     <title>User Dashboard</title>
     <!-- General styles for consistant look across certain aspects like navbar-->
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
     
     <div class="navbar">
         <a href="{% url 'update_account' %}" class="btn">Update Account</a>
+        {% if user.is_staff %}
+            <a href="{% url 'admin:index' %}" class="btn btn-admin">Admin Portal</a>
+        {% endif %}
         <a href="{% url 'index' %}" class="btn btn-secondary">Home</a>
         <a href="{% url 'logout' %}" class="btn logout-btn">Logout</a>
     </div>
@@ -41,7 +45,7 @@
                                 <h3>{{ character.name }}</h3>
                                 <p>Level {{ character.level }} {{ character.charClass }} ({{ character.race }})</p>
                                 
-                                <!-- Image Upload Form ChatGPT helped with the onChange event-->
+                                <!-- Image Upload Form ChatGPT helped with this -->
                                 <form method="POST" enctype="multipart/form-data" style="margin-bottom: 10px;">
                                     {% csrf_token %}
                                     <input 
@@ -58,7 +62,7 @@
                                 </form>
 
                                 <br>
-                                <!-- Redirects to a finer detail of the character's informatoin-->
+                                <!-- Redirects to a finer detail of the character's informatoin -->
                                 <form method="POST" action="{% url 'character_detail' character.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-primary">View Details</button>
