@@ -42,8 +42,6 @@ class Campaign(models.Model):
     #Access token for a campaign owner to pass to a player in their campaign
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Auto-generated access token
 
-
-
     def __str__(self):
         return self.name
 
@@ -58,10 +56,7 @@ class Character(models.Model):
 
     #ChatGPT helped in the creation of this definition
     def user_directory_path(instance, filename):
-        """
-        Create a unique path for each user's uploaded files.
-        Example: media/characters/user_<id>/<unique_filename>
-        """
+
         # Extract file extension
         ext = filename.split('.')[-1]
 
@@ -99,13 +94,13 @@ class Character(models.Model):
     # Secondary Attributes
     # To add some more color these will be the attributes the DM will be using and or modifying during a campaign 
     # Special permissions will want to be used for something like this
-    hitPoints = models.IntegerField(validators=[MinValueValidator(0)], help_text="Current hit points")
-    maxHitPoints = models.IntegerField(validators=[MinValueValidator(1)], help_text="Maximum hit points")
+    hitPoints = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10000)], help_text="Current hit points")
+    maxHitPoints = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10000)], help_text="Maximum hit points")
     armorClass = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Armor Class (AC)")
-    speed = models.IntegerField(validators=[MinValueValidator(1)], help_text="Movement speed in feet per round")
+    speed = models.IntegerField(validators=[MinValueValidator(1), (MaxValueValidator(10000))], help_text="Movement speed in feet per round")
     proficiencyBonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)], help_text="Character level (1-20)")
-    experiencePoints = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
+    experiencePoints = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(1000000)], help_text="Experience points accumulated")
     
     # Skills
     # In this case we are going to let the player mark if they have said skill or not. 

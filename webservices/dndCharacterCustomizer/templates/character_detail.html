@@ -176,18 +176,23 @@
 
             {% if character.image %}
                 <img src="{{ character.image.url }}" alt="{{ character.name }}" class="character-image">
-                <form method="POST" style="margin-top: 10px;">
-                    {% csrf_token %}
-                    <input type="hidden" name="delete_image" value="1">
-                    <button type="submit" class="btn btn-danger">Delete Image</button>
-                </form>
             {% else %}
                 <div class="placeholder">No Image</div>
             {% endif %}
 
+            <!-- Image Upload Form ChatGPT helped with this -->
             <form method="POST" enctype="multipart/form-data" style="margin-top: 10px;">
                 {% csrf_token %}
-                {{ image_upload_form.as_p }}
+                <input 
+                    type="file" 
+                    name="image" 
+                    id="file-input-{{ character.id }}" 
+                    style="display: none;" 
+                    onchange="document.getElementById('file-name-{{ character.id }}').innerText = this.files[0]?.name || 'No file selected';"
+                >
+                <label for="file-input-{{ character.id }}" class="btn">Select Image</label>
+                <span id="file-name-{{ character.id }}" class="file-name">No file selected</span>
+                <input type="hidden" name="character_id" value="{{ character.id }}">
                 <button type="submit" name="upload_image" class="btn">Upload Image</button>
             </form>
         </div>

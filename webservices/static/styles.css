@@ -47,8 +47,8 @@ section {
 
 /* Card Styling */
 .card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: #ffffff;
+    border: 1px solid #dddddd;
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -99,6 +99,14 @@ section {
     text-decoration: none;
 }
 
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
 .btn:hover {
     background-color: #0056b3; /* Darker blue for hover */
 }
@@ -112,12 +120,29 @@ section {
     background-color: #a71d2a; /* Darker red for hover */
 }
 
+.logout-btn {
+    background-color: #d9534f; /* Red color */
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c; /* Darker red */
+}
+
+
 .file-name {
     margin-left: 10px;
     font-style: italic;
     color: #666;
 }
 
+/* ChatGPT helped. Eseentially on input elemtns with type file, the browser uses a webkit. 
+This will hide the default button and replace it with a custom one */
 input[type="file"]::-webkit-file-upload-button {
     visibility: hidden;
 }
@@ -127,21 +152,23 @@ input[type="file"]::-webkit-file-upload-button {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .form-container {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Navigation Sytles */
 
 .navbar {
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dddddd;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -169,48 +196,13 @@ input[type="file"]::-webkit-file-upload-button {
     cursor: not-allowed;
 }
 
-/* General button styling */
-.btn {
-    display: inline-block;
-    padding: 10px 15px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    color: #ffffff;
-    background-color: #007bff; /* Default blue */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.logout-btn {
-    background-color: #d9534f; /* Red color */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.logout-btn:hover {
-    background-color: #c9302c; /* Darker red */
-}
+/* Password Requirement Styles */
 
 .password-requirements {
     background-color: #f8f9fa; /* Light gray background */
     padding: 15px;
     margin-bottom: 20px;
-    border: 1px solid #ddd; /* Subtle border */
+    border: 1px solid #dddddd; /* Subtle border */
     border-radius: 5px;
 }
 
