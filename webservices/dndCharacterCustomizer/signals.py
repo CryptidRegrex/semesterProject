@@ -3,7 +3,15 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import Profile
 
-#This essentially meets some criteria and then the dectoractor will validate that the criteria is met AND the function executes. 
+
+"""Had some help from ChatGPT with this method
+   The decorator specifies when a certain action happens on a specific maodel execute this
+
+   The sender or User is sent, it's instance of the record, flag if the user was created during save(), and
+   all other keyword arguments
+
+   The point of this is so that when a user is created we also create a profile record related to the User
+"""
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
