@@ -2,27 +2,31 @@
 #If a user tries to access this page without authentication it will redirect them
 #If the user IS logged in it will execute the definition
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+#auth_login is called for authentcating login service. Renamed for easy of use
+from django.contrib.auth import authenticate, logout, update_session_auth_hash, login as auth_login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Profile, Character, Campaign
-#This took forever to figure out. Essentially we are going to call django's native login() function and we are going to rename it to make it clear what it is
-#used within login_view definition
-from django.contrib.auth import authenticate, login as auth_login
-from django.http import Http404
+#For the standard password form from django
 from django.contrib.auth.forms import PasswordChangeForm
+from .models import Profile, Character, Campaign
+from django.contrib.auth.password_validation import validate_password
 from .forms import CharacterForm, CampaignForm, AccessTokenForm, CharacterImageUploadForm, UpdateCharacterForm, UpdateUserForm
 import random
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.http import HttpResponseForbidden
+from django.core.exceptions import ValidationError
 
-# Index view for the home page when I render the initial page
+
+"""Index view for the home page when I render the initial page
+"""
 def index(request):
     return render(request, 'index.html')
 
-# This will render the login.html page so users can attempt to authenticate to the application
+
+"""This will render the login.html page so users can attempt to authenticate to the application
+"""
 def login_view(request):
     #Based on the request we'll authenticate 
     if request.method == "POST":
@@ -38,20 +42,25 @@ def login_view(request):
     
     return render(request, "login.html")
 
+"""Renders the password request page
+"""
 def reset_password_request(request):
     if request.method == "POST":
         email = request.POST.get("email")
         try:
             user = User.objects.get(email=email)
-            reset_token = get_random_string(32)  # Generate a secure random token
-            user.profile.reset_token = reset_token  # Assume `reset_token` exists in the Profile model
+            reset_token = get_random_string(32)  # Generate a secure random token using crypto lib
+            # Pass the crypto token into the profile for reseting the password
+            user.profile.reset_token = reset_token 
             user.profile.save()
 
+            # This will build an absolute url briefly for the user to be directed to
             reset_link = request.build_absolute_uri(f"/reset-password/{reset_token}/")
+            # Requires email to send from in django... find in the settings.py 
             send_mail(
                 "Password Reset Request",
                 f"Click the following link to reset your password: {reset_link}",
-                "no-reply@example.com",
+                "dndcharactercustomizer@gmail.com",
                 [email],
             )
             messages.success(request, "Password reset email sent. Please check your inbox.")
@@ -61,23 +70,35 @@ def reset_password_request(request):
     
     return render(request, "reset_password_request.html")
 
+"""Hanldes the reset password confirmation page
+   AKA the actually password update page
+Returns:
+   htrml page of the password plus the token value stored on teh profile
+"""
 def reset_password_confirm(request, token):
-    # Fetch the Profile using the reset_token
-    profile = get_object_or_404(Profile, reset_token=token)
+    profile = get_object_or_404(Profile, reset_token=token) # Fetch the Profile using the reset_token
     user = profile.user
 
     if request.method == "POST":
         new_password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
-        if new_password and confirm_password:  # Ensure both fields are provided
+        # Validate both passwords are not empty
+        if new_password and confirm_password: 
+            # Validate they are the same
             if new_password == confirm_password:
-                user.set_password(new_password)
-                user.save()
-                profile.reset_token = None  # Clear the reset token
-                profile.save()
-                messages.success(request, "Your password has been reset successfully!")
-                return redirect("login")  # Redirect to login after success
+                try:
+                    # Validate the new password using Django's validators
+                    validate_password(new_password, user)
+                    user.set_password(new_password)
+                    user.save() # Update user's password
+                    profile.reset_token = None  # Clear the reset token
+                    profile.save()
+                    messages.success(request, "Your password has been reset successfully!")
+                    return redirect("login")  # Redirect to login after success
+                except ValidationError as e:
+                    # Pass validation error messages to the template
+                    messages.error(request, ", ".join(e.messages))
             else:
                 messages.error(request, "Passwords do not match. Please try again.")
         else:
@@ -86,6 +107,16 @@ def reset_password_confirm(request, token):
     return render(request, "reset_password.html", {"token": token})
 
 
+"""This view handles all spects of the character details page
+   When a POST request is made a user can do one of many differnet things:
+   -Upload an image
+   -Delete an inmage
+   -Update an existing character
+   -Join a campaign
+   -Leave a campaign
+Returns:
+    returns html page and forms
+"""
 @login_required
 def character_detail(request, character_id):
     # Get the character, ensuring it belongs to the logged-in user
@@ -96,16 +127,17 @@ def character_detail(request, character_id):
     update_character_form = UpdateCharacterForm(instance=character)
 
     if request.method == "POST":
+        # Upload Image Logic
         if "upload_image" in request.POST:
-            # Handle image upload
             image_upload_form = CharacterImageUploadForm(request.POST, request.FILES, instance=character)
             if image_upload_form.is_valid():
                 image_upload_form.save()
                 messages.success(request, "Image uploaded successfully!")
             else:
-                messages.error(request, "Failed to upload image. Please try again.")
+                for error in image_upload_form.errors.values():
+                    messages.error(request, error)
+        # Delete Image Logic
         elif "delete_image" in request.POST:
-            # Handle image deletion
             if character.image:
                 character.image.delete()  # Deletes the file from storage
                 character.image = None
@@ -113,16 +145,16 @@ def character_detail(request, character_id):
                 messages.success(request, "Image deleted successfully!")
             else:
                 messages.error(request, "No image to delete.")
+        # Upadte Character Logic
         elif "update_character" in request.POST:
-            # Handle character update
             update_character_form = UpdateCharacterForm(request.POST, instance=character)
             if update_character_form.is_valid():
                 update_character_form.save()
                 messages.success(request, f"Character '{character.name}' updated successfully.")
             else:
                 messages.error(request, "Failed to update character. Please fix the errors below.")
+        #Join Campign Logic
         elif "join_campaign" in request.POST:
-            # Handle joining a campaign
             campaign_token = request.POST.get("campaign_token")
             campaign = Campaign.objects.filter(access_token=campaign_token).first()
             if campaign:
@@ -133,12 +165,12 @@ def character_detail(request, character_id):
                     messages.info(request, f"Character '{character.name}' is already part of the campaign '{campaign.name}'.")
             else:
                 messages.error(request, "Invalid campaign token. Please try again.")
+        # Leave Campaign Logic
         elif "leave_campaign" in request.POST:
-            # Handle leaving a campaign
             campaign_id = request.POST.get("campaign_id")
-            campaign = Campaign.objects.filter(id=campaign_id).first()
-            if campaign and campaign in character.campaigns.all():
-                character.campaigns.remove(campaign)
+            campaign = Campaign.objects.filter(id=campaign_id).first() #Finds the first campaign via id
+            if campaign and campaign in character.campaigns.all(): 
+                character.campaigns.remove(campaign) #Removes character from the relationships
                 messages.success(request, f"Character '{character.name}' has left the campaign '{campaign.name}'.")
             else:
                 messages.error(request, "Could not leave the campaign. Please try again.")
@@ -147,6 +179,7 @@ def character_detail(request, character_id):
     # Fetch campaigns the character is part of
     campaigns = character.campaigns.all()
 
+    # Returning the html page and all forms to populate in the html
     return render(request, "character_detail.html", {
         "character": character,
         "image_upload_form": image_upload_form,
@@ -154,7 +187,20 @@ def character_detail(request, character_id):
         "campaigns": campaigns,
     })
 
-
+"""This view handles actions between the dashboard page and the backend.
+   The decorator will force authentication before access
+   This will allow users to:
+   -Create Charcter
+   -Create Randomized Charcter
+   -Create a campaign
+   -Access Associated Characters
+   -Update Associated Character's stats
+   -Upload Images
+   -Delete Images
+   -Delete a campaign
+Returns:
+    html page of the dashboard and all forms to populate the html
+"""
 @login_required
 def user_dashboard(request):
     profile = Profile.objects.get(user=request.user)
@@ -238,7 +284,8 @@ def user_dashboard(request):
                 form.save()  # Save the form if valid
                 messages.success(request, f"Image uploaded for character '{character.name}'.")
             else:
-                messages.error(request, f"Failed to upload image: {form.errors}")
+                for error in form.errors.values():
+                    messages.error(request, error)
             return redirect('user_dashboard')
         
         elif "delete_image" in request.POST:
@@ -284,7 +331,15 @@ def user_dashboard(request):
         'character_image_forms': character_image_forms,  
     })
 
-
+"""Method will hadle account updates
+   This will:
+   -Update Email
+   -Update Username
+   -Update Password
+   -Delete Account
+Returns:
+    update_account.html and all necessary forms
+"""
 @login_required
 def update_account(request):
     user = request.user
@@ -327,7 +382,12 @@ def update_account(request):
         "password_form": password_form,
     })
 
-
+"""Requires authetnication before access
+   This will:
+   -Update character
+Returns:
+    update_character.html and all necessary forms
+"""
 @login_required
 def update_character(request, character_id):
     # Fetch the character
@@ -357,12 +417,17 @@ def update_character(request, character_id):
         'campaign': associated_campaign,
     })
 
-
+"""Handles logout function. 
+"""
 def logout_view(request):
     logout(request)  # Log out the user
     return redirect("login")  # Redirect to login page
 
 #To note here the signal will process the creation of a profile record. 
+"""Registration process with validation checks.
+   User must have all fields filled, passwords the same, unique usernames and email addresses
+   Validation is done at the model level for the field data.
+"""
 def register_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -370,46 +435,63 @@ def register_view(request):
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         
-        errors = []
-        
         # Validate passwords
         if password1 != password2:
-            errors.append("Passwords do not match.")
+            messages.error(request, "Passwords do not match.")
+            return render(request, "register.html")
+
+        # This validates that the password meets minimum requirements before it will be accepted.
+        try:
+            validate_password(password1)
+        # Want to let the user know what they need to do to meet minimum requirements.
+        except ValidationError as e:
+            for error in e:
+                messages.error(request, error)
+            return render(request, "register.html")
         
         # Check if username is taken
         if User.objects.filter(username=username).exists():
-            errors.append("Username is already taken.")
+            messages.error(request,"Username is already taken.")
+            return render(request, "register.html")
         
         # Check if email is taken
         if User.objects.filter(email=email).exists():
-            errors.append("Email is already registered.")
+            messages.error(request, "Email is already registered.")
+            return render(request, "register.html")
         
-        if errors:
-            return render(request, "register.html", {"errors": errors})
         
         # Create the user
         user = User.objects.create_user(username=username, email=email, password=password1)
         user.save()
-        
-        messages.success(request, "Your account has been created! You can now log in.")
-        return redirect("login")
+        auth_login(request, user)
+        return redirect("user_dashboard")
     
     return render(request, "register.html")
 
-# Add a character to a user's profile
+
+
+
+#========================================Helper methods=====================================
+
+
+
+
+"""Adding a character to the profile is done by calling this
+"""
 def add_character_to_profile(user, character_id):
     profile = user.profile
     character = Character.objects.get(id=character_id)
     profile.characters.add(character)
 
-# Add a campaign to a user's profile
+"""Adding a campaign to a user profile using this method.
+"""
 def add_campaign_to_profile(user, campaign_id):
     profile = user.profile
     campaign = Campaign.objects.get(id=campaign_id)
     profile.campaigns.add(campaign)
 
-
-#Helper methods
+"""Functions as the simple character randomizer. Simple random functions used to pick different aspects of the character.
+"""
 def randomize_character():
     races = ["Human", "Elf", "Dwarf", "Halfling", "Dragonborn", "Tiefling", "Gnome", "Half-Orc", "Half-Elf"]
     backgrounds = ["Soldier", "Noble", "Urchin", "Sage", "Criminal", "Folk Hero"]
@@ -432,7 +514,7 @@ def randomize_character():
         "hitPoints": hit_points,  
         "maxHitPoints": hit_points,
         "armorClass": random.randint(10, 18),
-        "speed": 30,  # Standard speed for most characters
+        "speed": 30,  # Standard speed for most characters, but not halflings and dwarfs. I could fix this with more robust code
         "proficiencyBonus": 2,  # Default for level 1
-        "level": 1,  # Start at level 1
+        "level": 1,  
     }

@@ -1,14 +1,15 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 #Using this for special access token to campaign
 import uuid
 import os
-from django.utils.timezone import now
-from PIL import Image
 
-
+"""This stores additional information about the User record
+   Using this as a detail object to store user types, relationships, and reset token which can be used for password resets
+Returns:
+    string: of user name and type of user
+"""
 class Profile(models.Model):
     # Link to the User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
@@ -33,7 +34,11 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.type}"
 
-
+"""Tracks campaign, user, and profile relationships
+   Stores access token needed to join a campaign
+Returns:
+    string: of campaign name
+"""
 class Campaign(models.Model):
     userOwner = models.ForeignKey(Profile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, help_text="Name of the campaign")
@@ -42,12 +47,15 @@ class Campaign(models.Model):
     #Access token for a campaign owner to pass to a player in their campaign
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Auto-generated access token
 
-
-
     def __str__(self):
         return self.name
 
+"""This tracks character informatoin.
+   This model, models, a Dungeons & Dragons 5e character
 
+Returns:
+    string: Character name, level, class, and race
+"""
 class Character(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -58,10 +66,7 @@ class Character(models.Model):
 
     #ChatGPT helped in the creation of this definition
     def user_directory_path(instance, filename):
-        """
-        Create a unique path for each user's uploaded files.
-        Example: media/characters/user_<id>/<unique_filename>
-        """
+
         # Extract file extension
         ext = filename.split('.')[-1]
 
@@ -78,6 +83,7 @@ class Character(models.Model):
     campaigns = models.ManyToManyField('Campaign', related_name='campaign_characters', blank=True)
     
     #image for the player to upload something to the site - Help from ChatGPT to create this. 
+    #calling a new defintion that will ensure image is of certain type and size
     image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
 
     # Basic Info
@@ -98,13 +104,13 @@ class Character(models.Model):
     # Secondary Attributes
     # To add some more color these will be the attributes the DM will be using and or modifying during a campaign 
     # Special permissions will want to be used for something like this
-    hitPoints = models.IntegerField(validators=[MinValueValidator(0)], help_text="Current hit points")
-    maxHitPoints = models.IntegerField(validators=[MinValueValidator(1)], help_text="Maximum hit points")
+    hitPoints = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10000)], help_text="Current hit points")
+    maxHitPoints = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10000)], help_text="Maximum hit points")
     armorClass = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)], help_text="Armor Class (AC)")
-    speed = models.IntegerField(validators=[MinValueValidator(1)], help_text="Movement speed in feet per round")
+    speed = models.IntegerField(validators=[MinValueValidator(1), (MaxValueValidator(10000))], help_text="Movement speed in feet per round")
     proficiencyBonus = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)], help_text="Proficiency bonus (1-6)")
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)], help_text="Character level (1-20)")
-    experiencePoints = models.IntegerField(default=0, validators=[MinValueValidator(0)], help_text="Experience points accumulated")
+    experiencePoints = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(1000000)], help_text="Experience points accumulated")
     
     # Skills
     # In this case we are going to let the player mark if they have said skill or not. 
@@ -132,13 +138,16 @@ class Character(models.Model):
     performance = models.BooleanField(default=False, help_text="Proficient in Performance (Charisma-based)")
     persuasion = models.BooleanField(default=False, help_text="Proficient in Persuasion (Charisma-based)")
     
-    #Essentially, like in D&D take the score -10 and get the bonus from it
-    #Better user experience so they don't have to calculate that
+    
+    """Essentially, like in D&D take the score -10 and get the bonus from it
+       Better user experience so they don't have to calculate that
+    """
     def abilityModifier(self, score):
         """Calculate the ability modifier for a given ability score."""
         return (score - 10) // 2
 
-    #So for this one there's a lot going on
+    """tracks the skill modifiers based on selection of which skills are selected
+    """
     def skillModifier(self, skill_name):
         """
         Calculate skill modifier based on proficiency and associated ability score.

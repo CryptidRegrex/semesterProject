@@ -1,7 +1,2 @@
-from django.urls import path
-from . import views
+#Placeholder now
 
-urlpatterns = [
-    path('', views.index, name='index'),
-    path('', views.login, name='login'),
-]

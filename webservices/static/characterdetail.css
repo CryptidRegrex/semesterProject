@@ -72,6 +72,8 @@ form {
     margin-top: 15px;
 }
 
+/* ChatGPT helped with the next three
+ */
 input[type="file"] {
     padding: 8px;
     font-size: 14px;
@@ -82,6 +84,10 @@ input[type="file"] {
     background-color: #f8f9fa;
 }
 
+/* Does a number of things
+- Allows me to overwrite the deafult file input button
+- Forces text to stay on one line
+- Allows for styling at the block level*/
 input[type="file"]:before {
     content: 'Choose File';
     display: inline-block;
@@ -96,10 +102,13 @@ input[type="file"]:before {
     margin-right: 10px;
 }
 
+/* Changes color on hover of file input button */
 input[type="file"]:hover:before {
     background-color: #0056b3;
 }
 
+
+/* Character Sytles */
 .character-detail {
     display: grid;
     grid-template-columns: 4fr 2fr; /* Adjust the columns to give more space to the left column */
@@ -126,6 +135,8 @@ input[type="file"]:hover:before {
     margin-bottom: 10px;
 }
 
+/* Campign Sytles */
+
 .campaigns-section {
     margin-top: 20px;
     padding: 15px;
@@ -151,6 +162,7 @@ input[type="file"]:hover:before {
     margin-bottom: 5px;
 }
 
+/* Join Campign Sytles */
 
 .join-campaign-section {
     margin-top: 20px;
@@ -225,8 +237,4 @@ input[type="file"]:hover:before {
         width: 100%;
     }
 
-    .btn {
-        width: 100%;
-        text-align: center;
-    }
 }

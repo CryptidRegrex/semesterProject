@@ -1,0 +1,8 @@
+/* Admin Button */
+.btn-admin {
+    background-color: #591591; /* Red color */
+}
+
+.btn-admin:hover {
+    background-color: #26013f; /* Darker red for hover */
+}
