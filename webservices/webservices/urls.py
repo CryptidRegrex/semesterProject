@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from dndCharacterCustomizer import views
+from new_app import views
 from django.conf import settings
 from django.conf.urls.static import static
-from dndCharacterCustomizer.views import index, login_view, user_dashboard, logout_view, register_view, update_character, update_account, reset_password_request, reset_password_confirm
+from new_app.views import index, login_view, user_dashboard, logout_view, register_view, update_character, update_account, reset_password_request, reset_password_confirm
 #from rest_framework.routers import DefaultRouter
 # from dndCharacterCustomizer.viewsets import CharacterViewSet
 # from dndCharacterCustomizer.viewsets import UserRegistrationViewSet

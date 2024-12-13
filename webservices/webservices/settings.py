@@ -12,6 +12,67 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import google.auth
+from google.cloud import secretmanager
+
+
+
+#############################
+### ENVIRONMENT VARIABLES ###
+#############################
+try:
+    client = secretmanager.SecretManagerServiceClient()
+    name = "projects/dockerized-django-1/secrets/django_settings/versions/latest"
+    payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+    payload = payload.split('\n')
+    ENVIRONMENT = 'prod'
+ 
+    for p in payload: # Each line in payload looks like GOOGLE_CLOUD_PROJECT=my-project-id.
+        if p.startswith('GOOGLE_CLOUD_PROJECT'): 
+            GOOGLE_CLOUD_PROJECT = p.split('=')[1]
+
+        if p.startswith('GS_BUCKET_NAME'):
+            GS_BUCKET_NAME = p.split('=')[1]
+ 
+        if p.startswith('DATABASE_HOST'):
+            DATABASE_HOST = p.split('=')[1]
+ 
+        if p.startswith('DATABASE_NAME'):
+            DATABASE_NAME = p.split('=')[1]
+ 
+        if p.startswith('DATABASE_USER'):
+            DATABASE_USER = p.split('=')[1]
+ 
+        if p.startswith('DATABASE_PASSWORD'):
+            DATABASE_PASSWORD = p.split('=')[1]
+
+        if p.startswith('CLOUDRUN_SERVICE_URL'):
+            CLOUDRUN_SERVICE_URL = p.split('=')[1]
+             
+        if p.startswith('SECRET_KEY'):
+            result = ''
+            for i, s in enumerate(p.split('=')):
+                if i != 0:
+                    result += s
+            SECRET_KEY = result
+      
+    # Successfully loading secrets manager means production environment.
+    
+    DEBUG = True
+
+    if CLOUDRUN_SERVICE_URL:
+        ALLOWED_HOSTS = [CLOUDRUN_SERVICE_URL]
+        CSRF_TRUSTED_ORIGINS = ['https://' + CLOUDRUN_SERVICE_URL]
+        SECURE_SSL_REDIRECT = True
+        SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    
+except google.auth.exceptions.DefaultCredentialsError:
+    ENVIRONMENT = 'dev'
+    DEBUG = True
+    ALLOWED_HOSTS = ['*']
+    SECRET_KEY = os.environ.get('SECRET_KEY', '')
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,23 +82,36 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #Redirects the user to the homepage when logging out
-LOGOUT_REDIRECT_URL = 'index'
+#LOGOUT_REDIRECT_URL = 'index'
 
-#Needed to configure SSL settings for HTTPS.
-SECURE_SSL_REDIRECT = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+#Used for password validation on the User model
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},  # NIST minimum recommendation
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pg4zzsqt)15wj2jn+)k(j*5j0yenni_$2o!d=)8=$4a2q^!il)'
+#Security key
+#SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -49,7 +123,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dndCharacterCustomizer',
+    'new_app',
     'rest_framework',
     'rest_framework.authtoken',
     # 'sslserver'
@@ -97,7 +171,7 @@ ROOT_URLCONF = 'webservices.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "dndCharacterCustomizer/templates"],
+        'DIRS': [BASE_DIR / "dndCharacterCustomizer/templates", os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -116,16 +190,34 @@ WSGI_APPLICATION = 'webservices.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'db',  
-        'PORT': '5432',  # default PostgreSQL port
+        'ENGINE': 'django.db.backends.postgresql'
     }
 }
+if ENVIRONMENT == 'prod':
+    # Production, Google CloudSQL DB.
+    DATABASES['default']['NAME'] = DATABASE_NAME
+    DATABASES['default']['USER'] = DATABASE_USER
+    DATABASES['default']['PASSWORD'] = DATABASE_PASSWORD
+    DATABASES['default']['HOST'] = DATABASE_HOST
+else:
+    DATABASES['default']['PORT'] = 5432
+    if os.environ.get('USE_CLOUD_PROXY', False) == 'true':
+        # Local, Google CloudSQL Proxy DB.
+        print('Connect to DB: GOOGLE CLOUD PROXY')
+        DATABASES['default']['NAME'] = os.environ.get('CLOUD_PROXY_DB', '')
+        DATABASES['default']['USER'] = os.environ.get('CLOUD_PROXY_USER', '')
+        DATABASES['default']['PASSWORD'] = os.environ.get('CLOUD_PROXY_PASSWORD', '')
+        DATABASES['default']['HOST'] = 'new_app_cloudsql_proxy'
+    else:
+        # Local, Postgres DB.
+        print('Connect to DB: LOCAL POSTGRES')
+        DATABASES['default']['NAME'] = 'postgres'
+        DATABASES['default']['USER'] = 'postgres'
+        DATABASES['default']['PASSWORD'] = 'password'
+        DATABASES['default']['HOST'] = 'pgdb'
 
 
 # Password validation
@@ -162,11 +254,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "https://storage.googleapis.com/dockerized-django-media/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# if ENVIRONMENT == 'prod':
+#     STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+#     DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+#     STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+#     GS_DEFAULT_ACL = "publicRead"
 
-#Sets django to use static files
+
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, 'static'),
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -1,28 +1,38 @@
 services:
-  web:
+  django:
     build: .
+    container_name: new_app_django
+    env_file:
+      - ./.env
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app  # Mount the app directory
+      - .:/usr/src/new_app  # Mount the app directory
     ports:
       - "8000:8000"  # Map port 8000 of the host to port 8000 of the container
     depends_on:
-      - db  # Ensure that the db service starts before the web app
+      - pgdb  # Ensure that the db service starts before the web app
     environment:
-      - DEBUG=1
+      #- DEBUG=1
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres  # PostgreSQL database URL
 
-  db:
+  pgdb:
     image: postgres:14  # Use the official PostgreSQL image
+    container_name: new_app_pgdb
     volumes:
-      - postgres_data:/var/lib/postgresql/data/  # Persist database data
+      - ./postgres_data:/var/lib/postgresql/data/  # Persist database data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+  cloudsqlproxy:
+    container_name: new_app_cloudsql_proxy
+    image: gcr.io/cloudsql-docker/gce-proxy:latest
+    volumes:
+      - ./gcloud_sql_credentials.json:/secrets/cloudsql/gcloud_sql_credentials.json
     ports:
-      - "5432:5432"
+      - 5432:5432
+    command: /cloud_sql_proxy --dir=/cloudsql -instances=${CLOUD_INSTANCE_CONNECTION_NAME}=tcp:0.0.0.0:5432 -credential_file=/secrets/cloudsql/gcloud_sql_credentials.json
 
 volumes:
   postgres_data:

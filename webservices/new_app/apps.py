@@ -6,10 +6,10 @@ from django.apps import AppConfig
 """
 class DndcharactercustomizerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'dndCharacterCustomizer'
+    name = 'new_app'
 
     """This overrides the ready method
        When the app is ready this ensures the signal handler defined are registered
     """
     def ready(self):
-        import dndCharacterCustomizer.signals
+        import new_app.signals

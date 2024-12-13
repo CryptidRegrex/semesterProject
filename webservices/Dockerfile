@@ -1,22 +1,27 @@
 FROM python:3.11.9
 
 # Step 2: Set the working directory in the container
-WORKDIR /app
+WORKDIR /usr/src/new_app
 
 # Step 3: Copy the requirements.txt file to the container
-COPY requirements.txt /app/
+COPY requirements.txt ./
 
 # Step 4: Install any dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 # Step 5: Copy the rest of the application code to the working directory
-COPY . /app/
+COPY . .
+
+
+RUN python manage.py collectstatic --noinput
 
 # Step 6: copy the SSL cert into the container
-# COPY ssl /app/ssl
+ENV PYTHONUNBUFFERED=1
 
 # Step 7: Expose port 8000 (the port the Django app will run on)
 EXPOSE 8000
 
 # Step 8: Set the command to run the Django server
-CMD python manage.py runserver 0.0.0.0:8000 --cert-file /app/ssl/cert.pem --key-file /app/ssl/key.pem
+#CMD python manage.py runserver 0.0.0.0:8000 
+CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 webservices.wsgi:application
